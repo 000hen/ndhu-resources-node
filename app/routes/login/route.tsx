@@ -1,0 +1,17 @@
+import { Link, Outlet } from "@remix-run/react";
+
+export default function LoginLayout() {
+    return <div className="md:grid md:place-content-center h-full">
+        <div className="md:relative md:w-max">
+            <div className="bg-white md:shadow-md min-w-full md:min-w-96 rounded-md">
+                <div className="p-5">
+                    <Outlet />
+                </div>
+            </div>
+            <div className="md:absolute w-full md:text-white text-center translate-y-2">
+                <Link className="after:content-['•'] after:px-2" to={"/policy/service"}>服務條款</Link>
+                <Link to={"/policy/privacy"}>隱私權政策</Link>
+            </div>
+        </div>
+    </div>;
+}

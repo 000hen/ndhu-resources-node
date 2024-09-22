@@ -1,8 +1,12 @@
 import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import { remixRoutes } from "remix-routes/vite";
 
 export default defineConfig({
+  define: {
+    'process.env.NODE_DEBUG': false,
+  },
   plugins: [
     remix({
       future: {
@@ -11,6 +15,7 @@ export default defineConfig({
         v3_throwAbortReason: true,
       },
     }),
+    remixRoutes(),
     tsconfigPaths(),
   ],
 });
