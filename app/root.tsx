@@ -9,7 +9,18 @@ import {
     useMatches,
 } from "@remix-run/react";
 import { useState } from "react";
-import { MdAdminPanelSettings, MdClass, MdClose, MdDashboard, MdDescription, MdGroups, MdLogin, MdLogout, MdMenu, MdSearch } from "react-icons/md";
+import {
+    MdAdminPanelSettings,
+    MdClass,
+    MdClose,
+    MdDashboard,
+    MdDescription,
+    MdGroups,
+    MdLogin,
+    MdLogout,
+    MdMenu,
+    MdSearch
+} from "react-icons/md";
 import PanelLink from "./components/panel_link";
 import { IconType } from "react-icons";
 import LogoComponent from "./components/logo";
@@ -128,7 +139,7 @@ export default function App() {
                         {showMenu && <MdClose size={32} />}
                     </button>
                     <h1 className="text-2xl px-5 block mb-0 md:hidden"><LogoComponent /></h1>
-                    <div className="p-2">
+                    <div className="p-2 grid place-content-center">
                         {profileImg}
                     </div>
                 </div>
@@ -140,7 +151,7 @@ export default function App() {
                             </div>
                             <div className="w-full">
                                 <h1 className="text-2xl mb-5 px-5 hidden md:block"><LogoComponent /></h1>
-                                <div className="flex flex-col mt-5">
+                                <div className="flex flex-col md:mt-5">
                                     <Link to={"/search"} className="btn btn-base-100 w-full justify-start items-center mb-3">
                                         <MdSearch size={16} className="text-base-content" />
                                         資料搜尋
@@ -171,7 +182,7 @@ export default function App() {
                 </div>
             </div>
         </div>
-        <div className="p-5 md:p-10 w-full bg-base-100 overflow-auto">
+        <div className="p-5 md:p-10 w-full bg-base-100 overflow-auto md:h-screen">
             {page[matches] && <h1 className="text-4xl mb-5 font-bold">{page[matches].display}</h1>}
             <Outlet />
         </div>

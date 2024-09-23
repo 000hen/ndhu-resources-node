@@ -94,7 +94,7 @@ export default function ProfileIndex() {
                 <NumberCardFormatComponent amount={data.resources?.length || 0} format="項" />
             </CardComponent>
             <CardComponent title="已審核成功的資源">
-                <NumberCardFormatComponent amount={data.resources?.filter(e => e.verified).length || 0} format="項" />
+                <NumberCardFormatComponent amount={data.resources?.filter(e => e.state === "approved").length || 0} format="項" />
             </CardComponent>
             <CardComponent title="您推過的資源">
                 <NumberCardFormatComponent amount={data.pushOrDump?.filter(e => e.isPush).length || 0} format="項" />

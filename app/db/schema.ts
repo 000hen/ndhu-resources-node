@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { mysqlTable, text, foreignKey, index, int, varchar, timestamp, mysqlEnum } from "drizzle-orm/mysql-core";
+import { mysqlTable, text, foreignKey, index, int, varchar, timestamp, mysqlEnum, customType } from "drizzle-orm/mysql-core";
 import { v4 } from "uuid";
 
 export const courses = mysqlTable("courses", {
@@ -50,6 +50,12 @@ export const premissionRelations = relations(premissions, ({ many }) => ({
     downloaded: many(resourceDownloaded)
 }));
 
+export const tagTypes = customType<{ data: string[], driverData: string }>({
+    dataType: () => "text",
+    toDriver: (value: string[]) => value.join(", "),
+    fromDriver: (value: string) => value.split(", ")
+});
+
 export const resources = mysqlTable("resources", {
     id: int("id")
         .autoincrement()
@@ -63,7 +69,7 @@ export const resources = mysqlTable("resources", {
         .unique()
         .$defaultFn(() => v4()),
     description: text("description"),
-    tags: text("tags"),
+    tags: tagTypes("tags"),
     hash: varchar("hash", { length: 40 })
         .notNull()
         .unique(),

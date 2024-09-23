@@ -48,6 +48,6 @@ export function googleImageResize(original: string, size: number) {
     return original.replace("=s96-c", `=s${size}-c`);
 }
 
-export function classFormat(className: (string | null | undefined)[]) {
+export function classFormat(className: (string | null | undefined | boolean)[]) {
     return className.filter(e => !!e).join(" ");
 }
