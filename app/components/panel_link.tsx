@@ -2,6 +2,7 @@ import { Link } from "@remix-run/react";
 import { PropsWithChildren } from "react";
 import { IconType } from "react-icons";
 import { MdArrowForwardIos } from "react-icons/md";
+import { classFormat } from "~/utils";
 
 interface PanelLinkArgs extends PropsWithChildren {
     to: string,
@@ -16,7 +17,11 @@ export default function PanelLink(configs: PanelLinkArgs) {
 
     return <Link
         onClick={configs.onClick}
-        className={"p-5 my-1 hover:bg-gray-700 w-full rounded-lg text-xl flex items-center transition-colors".concat(" " + configs.className + " " + (hightlight ? "bg-base-100" : ""))}
+        className={classFormat([
+            "p-5 my-1 hover:bg-gray-700 w-full rounded-lg text-xl flex items-center transition-colors",
+            configs.className,
+            hightlight && "bg-base-100"
+        ])}
         to={configs.to}>
         {hightlight && <MdArrowForwardIos size={30} className="animate-pulse mr-2" />}
         {

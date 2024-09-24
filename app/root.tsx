@@ -130,7 +130,7 @@ export default function App() {
         setShowMenu((e) => !e);
     }
 
-    return <div className="relative max-h-screen overflow-y-auto flex lg:flex-row flex-col bg-neutral">
+    return <div className="relative max-h-screen overflow-y-auto flex lg:flex-row flex-col bg-base-100">
             <div className="sticky top-0 lg:h-full z-50 shadow-md lg:shadow-none">
                 <div className="backdrop-blur-md bg-neutral/80">
                     <div className="lg:hidden p-5 flex justify-between items-center">
@@ -182,7 +182,7 @@ export default function App() {
                     </div>
                 </div>
             </div>
-            <div className="p-5 lg:p-10 w-full bg-base-100 h-full lg:min-h-screen">
+            <div className="p-5 lg:p-10 w-full max-h-max">
                 {page[matches] && <h1 className="text-4xl mb-5 font-bold">{page[matches].display}</h1>}
                 <Outlet />
             </div>

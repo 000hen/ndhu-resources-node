@@ -4,5 +4,5 @@ export default function Search() {
             <h1 className="text-4xl">😭</h1>
             <h1 className="text-2xl">抱歉！此頁面還在建置中！</h1>
         </div>
-    </div>
+    </div>;
 }
