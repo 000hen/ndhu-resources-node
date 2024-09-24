@@ -1,7 +1,7 @@
 import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { eq } from "drizzle-orm";
-import { MdEdit, MdLocalPolice, MdLogout, MdVerified } from "react-icons/md";
+import { MdEdit, MdLocalPolice, MdLogout, MdStorage, MdThumbDown, MdThumbUp, MdVerified } from "react-icons/md";
 import CardComponent from "~/components/card";
 import IconBadgeComponent from "./icon_badge";
 import NumberCardFormatComponent from "~/components/number_card_format";
@@ -55,27 +55,29 @@ export default function ProfileIndex() {
                 <div className="flex-auto ml-5">
                     <div className="flex flex-col lg:flex-row justify-center items-start lg:items-center lg:justify-between h-full">
                         <div>
-                            <h1 className="flex items-center mb-0 text-4xl lg:text-6xl">
+                            <h1 className="flex flex-col lg:flex-row lg:items-center mb-0 text-4xl lg:text-6xl">
                                 {data.display}
                                 
-                                {checkIsNDHU(data.email || "@") && premissions >= Premission.VerifiedUser
-                                    && <IconBadgeComponent
-                                    icon={MdVerified}
-                                    className="text-success">
-                                    您使用東華大學之 Google 帳戶且已驗證 Email
+                                <div>
+                                    {checkIsNDHU(data.email || "@") && premissions >= Premission.VerifiedUser
+                                        && <IconBadgeComponent
+                                        icon={MdVerified}
+                                        className="text-success">
+                                        您使用東華大學之 Google 帳戶且已驗證 Email
+                                        </IconBadgeComponent>}
+
+                                    {premissions >= Premission.Editor && <IconBadgeComponent
+                                        icon={MdEdit}
+                                        className="text-info">
+                                        您具有版主權限
                                     </IconBadgeComponent>}
 
-                                {premissions >= Premission.Editor && <IconBadgeComponent
-                                    icon={MdEdit}
-                                    className="text-info">
-                                    您具有版主權限
-                                </IconBadgeComponent>}
-
-                                {premissions >= Premission.Admin && <IconBadgeComponent
-                                    icon={MdLocalPolice}
-                                    className="text-error">
-                                    您是東華資源庫的管理員
-                                </IconBadgeComponent>}
+                                    {premissions >= Premission.Admin && <IconBadgeComponent
+                                        icon={MdLocalPolice}
+                                        className="text-error">
+                                        您是東華資源庫的管理員
+                                    </IconBadgeComponent>}
+                                </div>
                             </h1>
                             <span className="block mt-2 italic text-gray-500">{data.email}</span>
                         </div>
@@ -92,18 +94,23 @@ export default function ProfileIndex() {
         <div className="md:grid grid-cols-2">
             <CardComponent title="您貢獻的資源數">
                 <NumberCardFormatComponent amount={data.resources?.length || 0} format="項" />
+                <Link to="resources" className="btn btn-outline mt-2"><MdStorage /> 查看您創建的資源</Link>
             </CardComponent>
             <CardComponent title="已審核成功的資源">
                 <NumberCardFormatComponent amount={data.resources?.filter(e => e.state === "approved").length || 0} format="項" />
+                <Link to="resources/accept" className="btn btn-outline mt-2"><MdStorage /> 查看已審核成功的資源</Link>
             </CardComponent>
             <CardComponent title="您推過的資源">
                 <NumberCardFormatComponent amount={data.pushOrDump?.filter(e => e.isPush).length || 0} format="項" />
+                <Link to="resources/push" className="btn btn-outline m-2"><MdThumbUp /> 查看您推薦過的資源</Link>
             </CardComponent>
             <CardComponent title="您踩過的資源">
                 <NumberCardFormatComponent amount={data.pushOrDump?.filter(e => !e.isPush).length || 0} format="項" />
+                <Link to="resources/dump" className="btn btn-outline m-2"><MdThumbDown /> 查看您不推薦的資源</Link>
             </CardComponent>
             <CardComponent title="您做出的評論">
                 <NumberCardFormatComponent amount={data.comments?.length || 0} format="項" />
+                <Link to="resources/comment" className="btn btn-outline m-2"><MdStorage /> 查看您留言過的資源</Link>
             </CardComponent>
         </div>
     </div>;

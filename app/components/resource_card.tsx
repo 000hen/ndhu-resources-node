@@ -23,11 +23,11 @@ interface ResourceCardArgs extends PropsWithChildren {
 }
 
 export default function ResourceCardComponent(configs: ResourceCardArgs) {
-    return <Link to={String(configs.id)}>
-        <div className={classFormat([
-            "card bg-neutral p-5 mb-2 flex flex-row items-center",
-            configs.className
-        ])}>
+    return <Link to={String(configs.id)} className={classFormat([
+        "card bg-neutral p-5 h-full",
+        configs.className
+    ])}>
+        <div className="flex flex-row items-center">
             {configs.rank && <div>
                 <span className="text-2xl font-bold mr-5">{configs.rank}.</span>
             </div>}
