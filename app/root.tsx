@@ -31,7 +31,7 @@ import "./tailwind.css";
 import { FaUser } from "react-icons/fa";
 import { googleImageResize, Premission } from "./utils";
 import db from "./db/client.server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import FooterButtonComponent from "./components/footer_button";
 
 interface PanelNaviagePage {
@@ -54,7 +54,11 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
             columns: {
                 premission: true
             },
-            where: (v) => eq(v.user_id, auth.id || "")
+            where: (v) => eq(v.user_id, sql.placeholder("id")),
+        })
+        .prepare()
+        .execute({
+            id: auth.id || ""
         });
 
     return json({
@@ -182,9 +186,23 @@ export default function App() {
                     </div>
                 </div>
             </div>
-            <div className="p-5 lg:p-10 w-full max-h-max">
-                {page[matches] && <h1 className="text-4xl mb-5 font-bold">{page[matches].display}</h1>}
-                <Outlet />
+        <div className="p-5 lg:p-10 w-full max-h-max">
+            {page[matches] && <h1 className="text-4xl mb-5 font-bold">{page[matches].display}</h1>}
+            <div className="alert alert-warning mb-2">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 shrink-0 stroke-current"
+                    fill="none"
+                    viewBox="0 0 24 24">
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span>本網站為正處於早期測試階段，功能可能暫時不完整或出現嚴重錯誤，敬請您的諒解。</span>
             </div>
-        </div>;
+            <Outlet />
+        </div>
+    </div>;
 }

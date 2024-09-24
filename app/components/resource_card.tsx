@@ -27,27 +27,29 @@ export default function ResourceCardComponent(configs: ResourceCardArgs) {
         "card bg-neutral p-5 h-full",
         configs.className
     ])}>
-        <div className="flex flex-row items-center">
+        <div className="items-center h-full">
             {configs.rank && <div>
                 <span className="text-2xl font-bold mr-5">{configs.rank}.</span>
             </div>}
-            {
-                configs.votes && <div className="flex flex-col items-center mr-5">
-                    <span className="text-2xl font-bold">
-                        <NumberCardFormatComponent amount={configs.votes.upvotes - configs.votes.downvotes} />
-                    </span>
-                    <span className="text-2xl">🔥</span>
-                </div>
-            }
-            <div>
+            <div className="col-span-3">
                 <div className="mb-5">
-                    <span className="block text-4xl font-bold">{configs.title}</span>
+                    <span className="inline-block text-4xl font-bold truncate overflow-hidden max-w-full">{configs.title}</span>
                     <div className={classFormat([
                         configs.tagsLimit && "max-w-full md:max-w-60"
                     ])}>
-                        {configs.tags && <div>
-                            {configs.tags.map((tag) => <span key={tag} className="badge badge-accent mr-1">#{tag}</span>)}
-                        </div>}
+                        <div className="flex flex-wrap gap-y-1">
+                            {configs.votes && <div className="badge badge-warning bg-orange-300 tooltip" data-tip="資源的熱門程度">
+                                <div className="flex items-center mr-2">
+                                    <span>🔥</span>
+                                    <span>
+                                        <NumberCardFormatComponent amount={configs.votes.upvotes - configs.votes.downvotes} />
+                                    </span>
+                                </div>
+                            </div>}
+                            <div className="divider divider-horizontal mx-1"></div>
+                            {configs.tags && configs.tags.map((tag) => <span key={tag} className="badge badge-accent mr-1">#{tag}</span>)}
+                            {!configs.tags && <span className="italic text-gray-500">糟糕！怎麼沒有 #Hashtags</span>}
+                        </div>
                     </div>
 
                     <div className="mt-2">

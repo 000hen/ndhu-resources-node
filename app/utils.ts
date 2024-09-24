@@ -8,6 +8,21 @@ export enum Premission {
     Admin        = 1 << 4,
 }
 
+export enum ResourceStatus {
+    Pending  = "pending",
+    Approved = "approved",
+    Rejected = "rejected",
+}
+
+export enum ResourceCategory {
+    Textbook = "textbook",
+    Homework = "homework",
+    Exam     = "exam",
+    Note     = "note",
+    Answer   = "answer",
+    Other    = "other",
+}
+
 export function redirectToLogin(request: Request) {
     return redirect("/login?return=" + encodeURIComponent(new URL(request.url).pathname));
 }

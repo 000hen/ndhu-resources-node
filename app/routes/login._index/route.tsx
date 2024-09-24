@@ -10,7 +10,7 @@ import Hr from "~/components/hr";
 import { AuthInfo, getAuthInfo } from "~/utils.server";
 import db from "~/db/client.server";
 import { premissions } from "~/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 export const meta: MetaFunction = () => {
     return [
@@ -39,8 +39,12 @@ export const action: ActionFunction = async ({ request }) => {
             premission: premissions.premission
         })
         .from(premissions)
-        .where(eq(premissions.user_id, data.sub))
-        .limit(1);
+        .where(eq(premissions.user_id, sql.placeholder("id")))
+        .limit(1)
+        .prepare()
+        .execute({
+            id: data.sub
+        });
 
     if (!user.length) {
         await db

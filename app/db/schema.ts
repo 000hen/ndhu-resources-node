@@ -60,7 +60,7 @@ export const resources = mysqlTable("resources", {
     id: int("id")
         .autoincrement()
         .primaryKey(),
-    name: varchar("name", { length: 64 })
+    name: varchar("name", { length: 256 })
         .notNull(),
     courses: int("courses")
         .references(() => courses.id, { onDelete: "set null" }),
@@ -77,6 +77,8 @@ export const resources = mysqlTable("resources", {
         .notNull()
         .references(() => premissions.user_id, { onDelete: "set default" })
         .default(""),
+    type: varchar("type", { length: 32 })
+        .references(() => resourceCategory.id, { onDelete: "set null" }),
     create_at: timestamp("create_at")
         .notNull()
         .default(sql`CURRENT_TIMESTAMP`),
@@ -94,9 +96,10 @@ export const resources = mysqlTable("resources", {
 export const resourceRelations = relations(resources, ({ one, many }) => ({
     course: one(courses, { fields: [resources.courses], references: [courses.id] }),
     author: one(premissions, { fields: [resources.upload_by], references: [premissions.user_id] }),
+    category: one(resourceCategory, { fields: [resources.type], references: [resourceCategory.id] }),
     pushOrDump: many(pushOrDump),
     comments: many(resources),
-    downloaded: many(resourceDownloaded)
+    downloaded: many(resourceDownloaded),
 }));
 
 export const pushOrDump = mysqlTable("pushOrDump", {
@@ -190,4 +193,23 @@ export const resourceDownloaded = mysqlTable("resourceDownloaded", {
 export const resourceDownloadedRelations = relations(resourceDownloaded, ({ one }) => ({
     author: one(premissions, { fields: [resourceDownloaded.author], references: [premissions.user_id] }),
     resource: one(resources, { fields: [resourceDownloaded.resource], references: [resources.id] })
-}))
+}));
+
+export const resourceCategory = mysqlTable("resourceCategory", {
+    id: varchar("id", { length: 32 })
+        .primaryKey()
+        .notNull(),
+    name: varchar("name", { length: 32 })
+        .notNull()
+        .unique(),
+    create_at: timestamp("create_at")
+        .notNull()
+        .default(sql`CURRENT_TIMESTAMP`)
+}, resourceCategory => ({
+    name_idx: index("resource_category_name_idx").on(resourceCategory.name),
+    id_name_idx: index("resource_category_id_name_idx").on(resourceCategory.id, resourceCategory.name)
+}));
+
+export const resourceCategoryRelations = relations(resourceCategory, ({ many }) => ({
+    resources: many(resources)
+}));

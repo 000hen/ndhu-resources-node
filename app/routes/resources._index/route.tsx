@@ -1,5 +1,5 @@
 import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { count, desc } from "drizzle-orm";
+import { count, desc, sql } from "drizzle-orm";
 import ResourceCardComponent from "../../components/resource_card";
 import db from "~/db/client.server";
 import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
@@ -46,13 +46,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
                 pushOrDump: {
                     columns: {
                         isPush: true
-                    }
-                }
+                    },
+                },
+                category: true
             },
-            offset: Number(requestQuery.get("page") || 1) * 20 - 20,
+            offset: sql.placeholder("offset"),
             orderBy: (v) => desc(v.id),
             limit: 20
+        })
+        .prepare()
+        .execute({
+            offset: Number(requestQuery.get("page") || 1) * 20 - 20
         });
+    
 
     return json({
         size: resourcesLength[0].count,
@@ -61,22 +67,29 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 enum SortBy {
-    AZ,
-    Votes,
-    Time,
-    Downloads
+    AZ        = "az",
+    Votes     = "votes",
+    Time      = "time",
+    Downloads = "downloads"
 }
 
 export default function ResourcesIndex() {
     const data = useLoaderData<typeof loader>();
     const pageNumberRef = useRef<HTMLInputElement>(null);
-    const [gridView, setGridView] = useState<boolean>(false);
-    const [sort, setSort] = useState<SortBy>(SortBy.Votes);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [gridView, setGridView] = useState<boolean>(false);
+    const [sort, setSort] = useState<SortBy>(searchParams.get("sort") as SortBy || SortBy.Votes);
 
     const currentPage = Number(searchParams.get("page") || 1);
 
     console.log(data);
+
+    function changeSort(sort: SortBy) {
+        const params = searchParams;
+        params.set("sort", String(sort));
+        setSearchParams(params);
+        setSort(sort);
+    }
 
     function setPageNumber(page: number) {
         if (!pageNumberRef.current)
@@ -119,11 +132,6 @@ export default function ResourcesIndex() {
                                 <MdSearch />
                             </Link>
                         </div>
-                        <div className="tooltip mr-2" data-tip="熱門資源">
-                            <Link to={"feature"} className="btn btn-warning">
-                                <FaFire />
-                            </Link>
-                        </div>
                         <Link to={"new"} className="btn btn-success">
                             <MdAdd className="block" />
                             <span className="hidden sm:block">新增資源</span>
@@ -131,16 +139,16 @@ export default function ResourcesIndex() {
                     </div>
                     <div className="flex flex-row">
                         <div className="join md:mr-2">
-                            <JoinedButton tips="以熱門程度排序" isHighlighted={sort === SortBy.Votes} onClick={() => setSort(SortBy.Votes)}>
+                            <JoinedButton tips="以熱門程度排序" isHighlighted={sort === SortBy.Votes} onClick={() => changeSort(SortBy.Votes)}>
                                 <FaFire />
                             </JoinedButton>
-                            <JoinedButton tips="以創建順序排序" isHighlighted={sort === SortBy.Time} onClick={() => setSort(SortBy.Time)}>
+                            <JoinedButton tips="以創建順序排序" isHighlighted={sort === SortBy.Time} onClick={() => changeSort(SortBy.Time)}>
                                 <MdAccessTimeFilled />
                             </JoinedButton>
-                            <JoinedButton tips="以創建 A-Z 排序" isHighlighted={sort === SortBy.AZ} onClick={() => setSort(SortBy.AZ)}>
+                            <JoinedButton tips="以創建 A-Z 排序" isHighlighted={sort === SortBy.AZ} onClick={() => changeSort(SortBy.AZ)}>
                                 <MdSortByAlpha />
                             </JoinedButton>
-                            <JoinedButton tips="以下載次數排序" isHighlighted={sort === SortBy.Downloads} onClick={() => setSort(SortBy.Downloads)}>
+                            <JoinedButton tips="以下載次數排序" isHighlighted={sort === SortBy.Downloads} onClick={() => changeSort(SortBy.Downloads)}>
                                 <MdDownload />
                             </JoinedButton>
                         </div>
@@ -157,8 +165,8 @@ export default function ResourcesIndex() {
             </ResourcePanel>
             
             <div className={classFormat([
-                "grid",
-                gridView ? "md:grid-cols-2 2xl:grid-cols-3 gap-2" : "gap-2"
+                "grid gap-2 grid-cols-1",
+                gridView && "md:grid-cols-2 2xl:grid-cols-3"
             ])}>
                 {data.resources.map((resource) => {
                     return <ResourceCardComponent

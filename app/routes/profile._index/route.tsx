@@ -1,6 +1,6 @@
 import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { MdEdit, MdLocalPolice, MdLogout, MdStorage, MdThumbDown, MdThumbUp, MdVerified } from "react-icons/md";
 import CardComponent from "~/components/card";
 import IconBadgeComponent from "./icon_badge";
@@ -22,17 +22,21 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
         .query
         .premissions
         .findFirst({
-        with: {
-            resources: {
-                with: {
-                    course: true
-                }
+            with: {
+                resources: {
+                    with: {
+                        course: true
+                    }
+                },
+                comments: true,
+                pushOrDump: true
             },
-            comments: true,
-            pushOrDump: true
-        },
-        where: (v) => eq(v.user_id, (auth.id || ""))
-    });
+            where: (v) => eq(v.user_id, sql.placeholder("id")),
+        })
+        .prepare()
+        .execute({
+            id: auth.id || ""
+        });
 
     return json({
         ...auth,
@@ -93,23 +97,23 @@ export default function ProfileIndex() {
 
         <div className="md:grid grid-cols-2">
             <CardComponent title="您貢獻的資源數">
-                <NumberCardFormatComponent amount={data.resources?.length || 0} format="項" />
+                <NumberCardFormatComponent bold amount={data.resources?.length || 0} format="項" />
                 <Link to="resources" className="btn btn-outline mt-2"><MdStorage /> 查看您創建的資源</Link>
             </CardComponent>
             <CardComponent title="已審核成功的資源">
-                <NumberCardFormatComponent amount={data.resources?.filter(e => e.state === "approved").length || 0} format="項" />
+                <NumberCardFormatComponent bold amount={data.resources?.filter(e => e.state === "approved").length || 0} format="項" />
                 <Link to="resources/accept" className="btn btn-outline mt-2"><MdStorage /> 查看已審核成功的資源</Link>
             </CardComponent>
             <CardComponent title="您推過的資源">
-                <NumberCardFormatComponent amount={data.pushOrDump?.filter(e => e.isPush).length || 0} format="項" />
+                <NumberCardFormatComponent bold amount={data.pushOrDump?.filter(e => e.isPush).length || 0} format="項" />
                 <Link to="resources/push" className="btn btn-outline m-2"><MdThumbUp /> 查看您推薦過的資源</Link>
             </CardComponent>
             <CardComponent title="您踩過的資源">
-                <NumberCardFormatComponent amount={data.pushOrDump?.filter(e => !e.isPush).length || 0} format="項" />
+                <NumberCardFormatComponent bold amount={data.pushOrDump?.filter(e => !e.isPush).length || 0} format="項" />
                 <Link to="resources/dump" className="btn btn-outline m-2"><MdThumbDown /> 查看您不推薦的資源</Link>
             </CardComponent>
             <CardComponent title="您做出的評論">
-                <NumberCardFormatComponent amount={data.comments?.length || 0} format="項" />
+                <NumberCardFormatComponent bold amount={data.comments?.length || 0} format="項" />
                 <Link to="resources/comment" className="btn btn-outline m-2"><MdStorage /> 查看您留言過的資源</Link>
             </CardComponent>
         </div>
