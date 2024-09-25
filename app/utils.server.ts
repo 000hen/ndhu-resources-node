@@ -29,7 +29,8 @@ export async function checkLogin({ request }: CheckLoginArgs): Promise<DecodedId
             return serverAuth
                 .verifySessionCookie(cookies)
                 .then(e => e as unknown as DecodedIdToken)
-                .then(e => res(e));
+                .then(e => res(e))
+                .catch(() => rej(false));
         } catch (e) {
             return rej(false);
         }

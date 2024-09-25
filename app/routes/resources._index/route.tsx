@@ -1,5 +1,5 @@
 import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { count, desc, sql } from "drizzle-orm";
+import { count } from "drizzle-orm";
 import ResourceCardComponent from "../../components/resource_card";
 import db from "~/db/client.server";
 import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
@@ -20,6 +20,8 @@ import { FaFire } from "react-icons/fa";
 import JoinedButton from "./joined_button";
 import { resources } from "~/db/schema";
 import ResourcePanel from "./panel";
+import { sortByDefault, sortByDownloads, sortByVotes } from "./sql_format.server";
+import { SortBy } from "./resources_interface";
 
 export const meta: MetaFunction = () => {
     return [
@@ -28,49 +30,37 @@ export const meta: MetaFunction = () => {
     ];
 };
 
+
 export async function loader({ request }: LoaderFunctionArgs) {
     const requestQuery = new URL(request.url).searchParams;
+    const sortBy = requestQuery.get("sort") as SortBy || SortBy.Votes;
+
+    const offset = Number(requestQuery.get("page") || 1) * 20 - 20;
 
     const resourcesLength = await db
         .select({
             count: count()
         })
         .from(resources);
-
-    const resourcesList = await db
-        .query
-        .resources
-        .findMany({
-            with: {
-                course: true,
-                pushOrDump: {
-                    columns: {
-                        isPush: true
-                    },
-                },
-                category: true
-            },
-            offset: sql.placeholder("offset"),
-            orderBy: (v) => desc(v.id),
-            limit: 20
-        })
-        .prepare()
-        .execute({
-            offset: Number(requestQuery.get("page") || 1) * 20 - 20
-        });
     
+    let resourcesList;
+    switch (sortBy) {
+        case SortBy.Votes:
+            resourcesList = await sortByVotes(offset);
+            break;
+        case SortBy.Downloads:
+            resourcesList = await sortByDownloads(offset);
+            break;
+        case SortBy.AZ:
+        case SortBy.Time:
+        default:
+            resourcesList = await sortByDefault(sortBy, offset);
+    }
 
     return json({
         size: resourcesLength[0].count,
         resources: resourcesList
     });
-}
-
-enum SortBy {
-    AZ        = "az",
-    Votes     = "votes",
-    Time      = "time",
-    Downloads = "downloads"
 }
 
 export default function ResourcesIndex() {
@@ -119,8 +109,6 @@ export default function ResourcesIndex() {
         setSearchParams(params);
         setPageNumber(page);
     }
-
-    // TODO: add functionality to sort options (by votes, by time, by name)
 
     return <div className="flex flex-col xl:flex-row">
         <div className="flex-auto z-0">
@@ -174,8 +162,8 @@ export default function ResourcesIndex() {
                         id={resource.id}
                         tags={resource.tags || undefined}
                         votes={{
-                            upvotes: resource.pushOrDump.filter((e) => e.isPush > 0).length,
-                            downvotes: resource.pushOrDump.filter((e) => e.isPush < 0).length
+                            upvotes: resource.votes.up,
+                            downvotes: resource.votes.down
                         }}
                         teacher={resource.course?.teacher || "N/A"}
                         subject={resource.course?.name || "N/A"}
