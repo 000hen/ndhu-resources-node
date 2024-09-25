@@ -64,7 +64,10 @@ export const resources = mysqlTable("resources", {
         .notNull(),
     courses: int("courses")
         .references(() => courses.id, { onDelete: "set null" }),
-    filename: varchar("filename", { length: 36 })
+    filename: varchar("filename", { length: 256 })
+        .notNull()
+        .unique(),
+    storageFilename: varchar("storage_filename", { length: 36 })
         .notNull()
         .unique()
         .$defaultFn(() => v4()),

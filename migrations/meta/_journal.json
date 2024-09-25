@@ -22,6 +22,20 @@
       "when": 1727187459365,
       "tag": "0002_amusing_ben_grimm",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1727276124814,
+      "tag": "0003_confused_kate_bishop",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1727277025448,
+      "tag": "0004_parched_doctor_strange",
+      "breakpoints": true
     }
   ]
 }

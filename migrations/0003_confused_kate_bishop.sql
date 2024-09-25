@@ -1,0 +1,1 @@
+CREATE FULLTEXT INDEX `resource_title_index` ON resources(`name`) WITH PARSER ngram;

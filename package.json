@@ -10,6 +10,7 @@
     "start": "HOST=127.0.0.1 PORT=40234 remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "migrations:gen": "drizzle-kit generate",
+    "migrations:gen-empty": "drizzle-kit generate --custom",
     "migrations:up": "drizzle-kit up",
     "migrations:apply": "tsx ./app/db/migrate.ts"
   },
