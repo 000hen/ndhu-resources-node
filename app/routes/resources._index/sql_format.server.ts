@@ -80,7 +80,8 @@ async function sortByPopularity(popularity: SortByPopularity): Promise<ResourceI
         .from(resources)
         .leftJoin(popularity, eq(resources.id, popularity.resource))
         .leftJoin(courses, eq(resources.courses, courses.id))
-        .leftJoin(resourceCategory, eq(resourceCategory.id, resources.type));
+        .leftJoin(resourceCategory, eq(resourceCategory.id, resources.type))
+        .orderBy(desc(popularity.popularity));
 
     return popularResources.map((e) => ({
         id: e.resources.id,

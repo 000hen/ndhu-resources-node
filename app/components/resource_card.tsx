@@ -31,6 +31,8 @@ export function HashTagsFormat({ tags }: { tags?: string[] }) {
 }
 
 export default function ResourceCardComponent(configs: ResourceCardArgs) {
+    const score = (configs.votes?.upvotes || 0) - (configs.votes?.downvotes || 0);
+
     return <Link to={String(configs.id)} className={classFormat([
         "card bg-neutral p-5 h-full",
         configs.className
@@ -50,7 +52,9 @@ export default function ResourceCardComponent(configs: ResourceCardArgs) {
                                 <div className="flex items-center mr-2">
                                     <span>🔥</span>
                                     <span>
-                                        <NumberCardFormatComponent amount={configs.votes.upvotes - configs.votes.downvotes} />
+                                        {!configs.votes.upvotes && !configs.votes.downvotes
+                                            ? "尚未有評分"
+                                            : <NumberCardFormatComponent amount={score} />}
                                     </span>
                                 </div>
                             </div>}

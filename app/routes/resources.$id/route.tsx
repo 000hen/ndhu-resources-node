@@ -12,6 +12,7 @@ import { FaUser } from "react-icons/fa";
 import { loader as rootLoader } from "~/root";
 import { getAuthInfoWithPremission } from "~/utils.server";
 import { useEffect } from "react";
+import { resourceDownloaded } from "~/db/schema";
 
 interface ResourceDownloadInterface extends ResourceInterface {
     size: number;
@@ -70,7 +71,7 @@ export async function loader({ params }: LoaderFunctionArgs): Promise<TypedRespo
 
 export async function action({ request, context, params }: LoaderFunctionArgs) {
     const auth = await getAuthInfoWithPremission({ request, context });
-    if (!auth.auth || (auth.premission || 0) < Premission.VerifiedUser)
+    if (!auth.auth || !auth.id || (auth.premission || 0) < Premission.VerifiedUser)
         return null;
 
     const { id } = params;
@@ -83,14 +84,22 @@ export async function action({ request, context, params }: LoaderFunctionArgs) {
             columns: {
                 storageFilename: true,
                 filename: true,
+                state: true,
             },
             where: (v) => eq(v.id, Number(id)),
         })
         .prepare()
         .execute();
     
-    if (!resource)
+    if (!resource || resource.state !== "approved")
         return null;
+
+    await db
+        .insert(resourceDownloaded)
+        .values({
+            resource: Number(id),
+            author: auth.id,
+        })
 
     return json({ storage: await getResourceSignedUrl(resource.storageFilename, resource.filename) });
 }
@@ -140,16 +149,20 @@ export default function ResourcePage() {
                         </div>
                     </div>
                     <div className="mt-5 min-w-max">
-                        {!parentData?.auth
-                            && <button
-                                onClick={() => navigate("/login?return=" + encodeURIComponent(location.pathname))}
-                                className="btn lg:min-w-60 w-full xl:w-40">
-                                請先登入至東華資源庫
-                            </button>}
-                        {parentData?.auth
-                            && (parentData.premission || 0) >= Premission.VerifiedUser
-                            ? <button onClick={downloadFile} className="btn btn-primary lg:min-w-60 w-full xl:w-40"><MdDownload size={16} />下載</button>
-                            : <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">抱歉！您的權限不足，無法下載！</button>}
+                        {data.state == "pending" && <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">檔案正在審核中，暫時不開放下載</button>}
+                        {data.state == "rejected" && <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">檔案已被拒絕，您無法下載</button>}
+                        {data.state == "approved" && <>
+                            {!parentData?.auth
+                                && <button
+                                    onClick={() => navigate("/login?return=" + encodeURIComponent(location.pathname))}
+                                    className="btn lg:min-w-60 w-full xl:w-40">
+                                    請先登入至東華資源庫
+                                </button>}
+                            {parentData?.auth
+                                && (parentData.premission || 0) >= Premission.VerifiedUser
+                                ? <button onClick={downloadFile} className="btn btn-primary lg:min-w-60 w-full xl:w-40"><MdDownload size={16} />下載</button>
+                                : <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">抱歉！您的權限不足，無法下載！</button>}
+                        </>}
                     </div>
                 </div>
             </div>
