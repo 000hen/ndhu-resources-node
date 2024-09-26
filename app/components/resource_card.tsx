@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react";
 import { PropsWithChildren } from "react";
 import { FaUser } from "react-icons/fa";
-import { MdClass } from "react-icons/md";
+import { MdCategory, MdClass } from "react-icons/md";
 import NumberCardFormatComponent from "~/components/number_card_format";
 import { classFormat } from "~/utils";
 
@@ -13,13 +13,21 @@ interface Votes {
 interface ResourceCardArgs extends PropsWithChildren {
     id: number,
     title: string,
-    teacher: string,
-    subject: string,
+    teacher?: string,
+    subject?: string,
     tags?: string[],
     tagsLimit?: boolean,
     className?: string,
     rank?: number,
-    votes?: Votes
+    votes?: Votes,
+    category?: string
+}
+
+export function HashTagsFormat({ tags }: { tags?: string[] }) {
+    return <>
+        {tags && tags.map((tag) => <span key={tag} className="badge badge-accent mr-1">#{tag}</span>)}
+        {!tags && <span className="italic text-gray-500">糟糕！怎麼沒有 #Hashtags</span>}
+    </>
 }
 
 export default function ResourceCardComponent(configs: ResourceCardArgs) {
@@ -32,7 +40,7 @@ export default function ResourceCardComponent(configs: ResourceCardArgs) {
                 <span className="text-2xl font-bold mr-5">{configs.rank}.</span>
             </div>}
             <div className="col-span-3">
-                <div className="mb-5">
+                <div>
                     <span className="inline-block text-4xl font-bold truncate overflow-hidden max-w-full">{configs.title}</span>
                     <div className={classFormat([
                         configs.tagsLimit && "max-w-full md:max-w-60"
@@ -47,17 +55,17 @@ export default function ResourceCardComponent(configs: ResourceCardArgs) {
                                 </div>
                             </div>}
                             <div className="divider divider-horizontal mx-1"></div>
-                            {configs.tags && configs.tags.map((tag) => <span key={tag} className="badge badge-accent mr-1">#{tag}</span>)}
-                            {!configs.tags && <span className="italic text-gray-500">糟糕！怎麼沒有 #Hashtags</span>}
+                            <HashTagsFormat tags={configs.tags} />
                         </div>
                     </div>
 
                     <div className="mt-2">
-                        <span className="flex items-center text-lg"><FaUser className="inline mr-2" />{configs.teacher}</span>
-                        <span className="flex items-center text-lg"><MdClass className="inline mr-2" />{configs.subject}</span>
+                        <span className="flex items-center text-lg"><FaUser className="inline mr-2" />{configs.teacher || "未知導師"}</span>
+                        <span className="flex items-center text-lg"><MdClass className="inline mr-2" />{configs.subject || "未分類課堂"}</span>
+                        {configs.category && <span className="flex items-center text-lg"><MdCategory className="inline mr-2" />{configs.category}</span>}
                     </div>
                 </div>
-                <p className="mb-0">{configs.children}</p>
+                {configs.children && <p className="mt-5">{configs.children}</p>}
             </div>
         </div>
     </Link>;

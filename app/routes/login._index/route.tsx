@@ -56,7 +56,7 @@ export const action: ActionFunction = async ({ request }) => {
     }
 
     const url = new URL(request.url);
-    const redirectPath = url.searchParams.get("return") || "/dashboard";
+    const redirectPath = url.searchParams.get("return") || "/resources";
 
     return redirect(redirectPath, {
         headers: {
@@ -105,7 +105,7 @@ export default function LoginIndex() {
             </>
         }
         <div>
-            <button onClick={signUpWithGoogle} className="block w-full mb-2 btn btn-info">
+            <button onClick={signUpWithGoogle} className="block w-full btn btn-info">
                 <span className="flex items-center">
                     <FaGoogle className="inline mr-2" />
                     使用您的 Google 帳戶登入

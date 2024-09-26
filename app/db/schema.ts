@@ -73,9 +73,6 @@ export const resources = mysqlTable("resources", {
         .$defaultFn(() => v4()),
     description: text("description"),
     tags: tagTypes("tags"),
-    hash: varchar("hash", { length: 40 })
-        .notNull()
-        .unique(),
     upload_by: varchar("upload_by", { length: 36 })
         .notNull()
         .references(() => premissions.user_id, { onDelete: "set default" })
@@ -93,7 +90,6 @@ export const resources = mysqlTable("resources", {
     course_idx: index("resources_course_idx").on(resources.courses),
     uploader_idx: index("resources_uploader_idx").on(resources.upload_by),
     create_at_idx: index("resources_create_at_idx").on(resources.create_at),
-    hash_idx: index("resources_hash_idx").on(resources.hash),
 }));
 
 export const resourceRelations = relations(resources, ({ one, many }) => ({

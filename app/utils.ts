@@ -1,5 +1,3 @@
-import { redirect } from "@remix-run/node";
-
 export enum Premission {
     Disabled     = 1 << 0,
     User         = 1 << 1,
@@ -21,10 +19,6 @@ export enum ResourceCategory {
     Note     = "note",
     Answer   = "answer",
     Other    = "other",
-}
-
-export function redirectToLogin(request: Request) {
-    return redirect("/login?return=" + encodeURIComponent(new URL(request.url).pathname));
 }
 
 export function getEmailDomain(email: string) {
@@ -65,4 +59,19 @@ export function googleImageResize(original: string, size: number) {
 
 export function classFormat(className: (string | null | undefined | boolean)[]) {
     return className.filter(e => !!e).join(" ");
+}
+
+export const humanFileSize = (size: number) => {
+    const i = size == 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+    return +((size / Math.pow(1024, i)).toFixed(2)) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+}
+
+export const downloadURI = (url: string, name?: string) => {
+    const link = document.createElement("a");
+    if (name)
+        link.setAttribute('download', name);
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
 }

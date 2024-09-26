@@ -1,7 +1,9 @@
-import { AppLoadContext } from "@remix-run/node";
+import { AppLoadContext, redirect } from "@remix-run/node";
 import { DecodedIdToken } from "./types/firebase";
-import cookie from "./cookies.server";
 import { auth as serverAuth } from "./firebase.server";
+import cookie from "./cookies.server";
+import db from "./db/client.server";
+import { eq, sql } from "drizzle-orm";
 
 interface CheckLoginArgs {
     request: Request,
@@ -15,6 +17,10 @@ export interface AuthInfo {
     email?: string,
     profile?: string,
     via?: string
+}
+
+export function redirectToLogin(request: Request) {
+    return redirect("/login?return=" + encodeURIComponent(new URL(request.url).pathname));
 }
 
 export async function checkLogin({ request }: CheckLoginArgs): Promise<DecodedIdToken> {
@@ -55,5 +61,27 @@ export async function getAuthInfo({ request, context }: { request: Request, cont
         profile: auth.picture,
         via: auth.firebase.sign_in_provider,
         id: auth.sub
+    };
+}
+
+export async function getAuthInfoWithPremission({ request, context }: { request: Request, context: AppLoadContext }) {
+    const auth = await getAuthInfo({ request, context });
+    const premission = await db
+        .query
+        .premissions
+        .findFirst({
+            columns: {
+                premission: true
+            },
+            where: (v) => eq(v.user_id, sql.placeholder("id")),
+        })
+        .prepare()
+        .execute({
+            id: auth.id || ""
+        });
+
+    return {
+        ...auth,
+        ...premission
     };
 }

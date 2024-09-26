@@ -13,7 +13,6 @@ import {
     MdAdminPanelSettings,
     MdClass,
     MdClose,
-    MdDashboard,
     MdDescription,
     MdGroups,
     MdLogin,
@@ -83,7 +82,6 @@ function pages(auth: AuthInfo): Pages {
     }
 
     return {
-        dashboard: { display: "儀錶板", path: "dashboard", icon: MdDashboard },
         resources: { display: "資源大廳", path: "resources", icon: MdDescription },
         courses: { display: "課堂列表", path: "courses", icon: MdClass },
         teachers: { display: "老師列表", path: "teachers", icon: MdGroups },
@@ -130,7 +128,6 @@ export default function App() {
     const premissions = data.premission || 0;
 
     function toggleMenu() {
-        console.log("toggle menu");
         setShowMenu((e) => !e);
     }
 

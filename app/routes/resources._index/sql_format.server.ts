@@ -7,8 +7,9 @@ import {
   resourceDownloaded,
   resources,
 } from "~/db/schema";
-import { ResourceInterface, SortBy } from "./resources_interface";
+import { SortBy } from "./resources_interface";
 import { SubqueryWithSelection, MySqlColumn } from "drizzle-orm/mysql-core";
+import { ResourceInterface } from "~/types/resource";
 
 type SortByPopularity =
     | SubqueryWithSelection<
@@ -86,7 +87,6 @@ async function sortByPopularity(popularity: SortByPopularity): Promise<ResourceI
         name: e.resources.name,
         description: e.resources.description,
         tags: e.resources.tags,
-        hash: e.resources.hash,
         upload_by: e.resources.upload_by,
         create_at: e.resources.create_at,
         state: e.resources.state,
@@ -163,7 +163,6 @@ export async function sortByDefault(mode: SortBy, offset: number): Promise<Resou
         name: e.name,
         description: e.description,
         tags: e.tags,
-        hash: e.hash,
         upload_by: e.upload_by,
         create_at: e.create_at,
         state: e.state,

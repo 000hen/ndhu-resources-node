@@ -30,7 +30,6 @@ export const meta: MetaFunction = () => {
     ];
 };
 
-
 export async function loader({ request }: LoaderFunctionArgs) {
     const requestQuery = new URL(request.url).searchParams;
     const sortBy = requestQuery.get("sort") as SortBy || SortBy.Votes;
@@ -71,8 +70,6 @@ export default function ResourcesIndex() {
     const [sort, setSort] = useState<SortBy>(searchParams.get("sort") as SortBy || SortBy.Votes);
 
     const currentPage = Number(searchParams.get("page") || 1);
-
-    console.log(data);
 
     function changeSort(sort: SortBy) {
         const params = searchParams;
@@ -167,8 +164,9 @@ export default function ResourcesIndex() {
                         }}
                         teacher={resource.course?.teacher || "N/A"}
                         subject={resource.course?.name || "N/A"}
-                        title={resource.name}>
-                        {resource.description}
+                        title={resource.name}
+                        category={resource.category?.name}>
+                        {resource.description && resource.description.length > 250 ? resource.description.slice(0, 250) + "..." : resource.description}
                     </ResourceCardComponent>;
                 })}
             </div>
