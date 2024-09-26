@@ -127,7 +127,7 @@ export default function ResourcePage() {
             <div className="p-5 2xl:p-10">
                 <div className="">
                     <div>
-                        <h1 className="text-4xl 2xl:text-6xl break-all max-w-full">{data.name}00000000000000000000000000000000000000000000000000000</h1>
+                        <h1 className="text-4xl 2xl:text-6xl break-all max-w-full">{data.name}</h1>
                         <HashTagsFormat tags={data.tags || undefined} />
                         <div className="mt-5">
                             {data.course && <>
