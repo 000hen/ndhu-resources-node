@@ -36,6 +36,9 @@ export const premissions = mysqlTable("premissions", {
     user_id: varchar("user_id", { length: 36 })
         .primaryKey()
         .notNull(),
+    display: varchar("display", { length: 32 })
+        .notNull()
+        .default(""),
     premission: int("premission")
         .notNull()
         .default(2)
@@ -136,8 +139,6 @@ export const comments = mysqlTable("comments", {
         .primaryKey()
         .notNull()
         .$defaultFn(() => v4()),
-    display_name: varchar("display_name", { length: 32 })
-        .notNull(),
     parent: varchar("parent", { length: 36 }),
     author: varchar("author", { length: 36 })
         .notNull()
@@ -151,7 +152,6 @@ export const comments = mysqlTable("comments", {
         .notNull()
         .default(sql`CURRENT_TIMESTAMP`)
 }, comments => ({
-    display_name_idx: index("comments_display_name_idx").on(comments.display_name),
     author_idx: index("comments_author_idx").on(comments.author),
     resource_idx: index("comments_resource_idx").on(comments.resource),
     author_resource: index("comments_author_resource_idx").on(comments.author, comments.resource),

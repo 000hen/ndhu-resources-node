@@ -2,7 +2,7 @@ import { json, LoaderFunctionArgs, MetaFunction, redirect, TypedResponse } from 
 import db from "~/db/client.server";
 import invariant from "tiny-invariant";
 import { ResourceInterface } from "~/types/resource";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { useFetcher, useLoaderData, useNavigate, useRouteLoaderData } from "@remix-run/react";
 import { getResourceSignedUrl, getResourceSize } from "~/storage/aws.server";
 import { MdArrowDownward, MdArrowUpward, MdCategory, MdClass, MdDownload, MdFlag, MdInsertDriveFile } from "react-icons/md";
@@ -109,10 +109,12 @@ export async function action({ request, context, params }: LoaderFunctionArgs) {
                 filename: true,
                 state: true,
             },
-            where: (v) => eq(v.id, Number(id)),
+            where: (v) => eq(v.id, sql.placeholder("id")),
         })
         .prepare()
-        .execute();
+        .execute({
+            id: Number(id),
+        });
     
     if (!resource || resource.state !== "approved")
         return null;
@@ -120,9 +122,14 @@ export async function action({ request, context, params }: LoaderFunctionArgs) {
     await db
         .insert(resourceDownloaded)
         .values({
+            resource: sql.placeholder("resource"),
+            author: sql.placeholder("author"),
+        })
+        .prepare()
+        .execute({
             resource: Number(id),
             author: auth.id,
-        })
+        });
 
     return json({ storage: await getResourceSignedUrl(resource.storageFilename, resource.filename) });
 }
@@ -135,24 +142,36 @@ async function actionUserVote(resource: number, user: string, type: number) {
             columns: {
                 isPush: true,
             },
-            where: (v) => and(eq(v.resource, resource), eq(v.author, user)),
+            where: (v) => and(eq(v.resource, sql.placeholder("resource")), eq(v.author, sql.placeholder("author"))),
         })
         .prepare()
-        .execute();
+        .execute({
+            resource,
+            author: user
+        });
     
     if (isUserVoted) {
         await db
             .delete(pushOrDump)
-            .where(and(eq(pushOrDump.resource, resource), eq(pushOrDump.author, user)))
+            .where(and(eq(pushOrDump.resource, sql.placeholder("resource")), eq(pushOrDump.author, sql.placeholder("author"))))
             .prepare()
-            .execute();
+            .execute({
+                resource,
+                author: user,
+            });
     }
 
     await db.insert(pushOrDump).values({
-        resource,
-        author: user,
-        isPush: type,
-    });
+        resource: sql.placeholder("resource"),
+        author: sql.placeholder("author"),
+        isPush: sql.placeholder("isPush"),
+    })
+        .prepare()
+        .execute({
+            resource,
+            author: user,
+            isPush: type
+        });
 
     return null;
 }

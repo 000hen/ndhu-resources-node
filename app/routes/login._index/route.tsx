@@ -11,6 +11,7 @@ import { AuthInfo, getAuthInfo } from "~/utils.server";
 import db from "~/db/client.server";
 import { premissions } from "~/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { checkIsNDHU, Premission } from "~/utils";
 
 export const meta: MetaFunction = () => {
     return [
@@ -36,7 +37,8 @@ export const action: ActionFunction = async ({ request }) => {
 
     const user = await db
         .select({
-            premission: premissions.premission
+            premission: premissions.premission,
+            display: premissions.display
         })
         .from(premissions)
         .where(eq(premissions.user_id, sql.placeholder("id")))
@@ -50,8 +52,28 @@ export const action: ActionFunction = async ({ request }) => {
         await db
             .insert(premissions)
             .values({
-                user_id: data.sub,
-                premission: data.email_verified ? 4 : 2
+                user_id: sql.placeholder("id"),
+                premission: sql.placeholder("premission"),
+            })
+            .prepare()
+            .execute({
+                id: data.sub,
+                premission: (data.email_verified && checkIsNDHU(data.email || ""))
+                    ? Premission.VerifiedUser
+                    : Premission.User
+            });
+    }
+
+    if (data.name !== user[0].display) {
+        await db
+            .update(premissions)
+            .set({
+                display: data.name
+            })
+            .where(eq(premissions.user_id, sql.placeholder("id")))
+            .prepare()
+            .execute({
+                id: data.sub
             });
     }
 

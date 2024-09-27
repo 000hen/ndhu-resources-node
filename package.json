@@ -8,6 +8,7 @@
     "dev": "remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "HOST=127.0.0.1 PORT=40234 remix-serve ./build/server/index.js",
+    "start:noenv": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "migrations:gen": "drizzle-kit generate",
     "migrations:gen-empty": "drizzle-kit generate --custom",

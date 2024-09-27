@@ -1,0 +1,1 @@
+ALTER TABLE `premissions` ADD `display` varchar(32) DEFAULT '' NOT NULL;
