@@ -1,3 +1,5 @@
+import ConstructionComponent from "~/components/construction";
+
 export default function CoursesIndex() {
-    return <p>course</p>;
+    return <ConstructionComponent />;
 }

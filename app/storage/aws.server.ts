@@ -1,4 +1,4 @@
-import { GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { CompleteMultipartUploadCommand, CreateMultipartUploadCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client, UploadPartCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 if (!process.env.S3_ENDPOINT) {
@@ -57,6 +57,34 @@ export async function getResourceSignedUrl(file: string, filename: string) {
 export async function putResourceWithSignedUrl(file: string) {
     return await getSignedUrl(S3, new PutObjectCommand({
         Bucket: bucket,
-        Key: file
+        Key: file,
     }), { expiresIn: EXPIRED_IN });
+}
+
+// Multipart Upload
+export async function createResourceMultipartUpload(file: string) {
+    return await S3.send(new CreateMultipartUploadCommand({
+        Bucket: bucket,
+        Key: file
+    }));
+}
+
+export async function uploadResourcePartWithSignedUrl(file: string, partNumber: number, uploadId: string) {
+    return await getSignedUrl(S3, new UploadPartCommand({
+        Bucket: bucket,
+        Key: file,
+        PartNumber: partNumber,
+        UploadId: uploadId
+    }), { expiresIn: EXPIRED_IN });
+}
+
+export async function completeResourceMultipartUpload(file: string, uploadId: string, parts: { ETag: string, PartNumber: number }[]) {
+    return await S3.send(new CompleteMultipartUploadCommand({
+        Bucket: bucket,
+        Key: file,
+        UploadId: uploadId,
+        MultipartUpload: {
+            Parts: parts
+        }
+    }));
 }

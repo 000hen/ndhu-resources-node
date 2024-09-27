@@ -75,3 +75,16 @@ export const downloadURI = (url: string, name?: string) => {
     link.click();
     link.remove();
 }
+
+export const numberFormat = (num: number) => {
+    const formatterText = new Intl.NumberFormat("zh-TW", { notation: "compact" });
+    const formatter = new Intl.NumberFormat("en-US");
+    const format = formatterText.format(num)
+        .replace(/([0-9]*)/gm, "$1 ")
+        .split(" ");
+    
+    if (format.length == 2)
+        format[0] = formatter.format(Number(format[0]));
+
+    return format.join("");
+}

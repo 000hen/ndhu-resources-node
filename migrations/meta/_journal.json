@@ -43,6 +43,13 @@
       "when": 1727360517696,
       "tag": "0005_colorful_moon_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1727402124543,
+      "tag": "0006_neat_spitfire",
+      "breakpoints": true
     }
   ]
 }

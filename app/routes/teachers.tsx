@@ -1,5 +1,5 @@
 import ConstructionComponent from "~/components/construction";
 
-export default function ProfileResourcesRoute() {
+export default function TeachersIndex() {
     return <ConstructionComponent />;
 }

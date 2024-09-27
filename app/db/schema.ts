@@ -82,7 +82,7 @@ export const resources = mysqlTable("resources", {
     create_at: timestamp("create_at")
         .notNull()
         .default(sql`CURRENT_TIMESTAMP`),
-    state: mysqlEnum("state", ["pending", "approved", "rejected"])
+    state: mysqlEnum("state", ["pending", "approved", "rejected", "DMCA takedown"])
         .notNull()
         .default("pending"),
 }, resources => ({

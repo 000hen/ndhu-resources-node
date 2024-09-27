@@ -1,0 +1,1 @@
+ALTER TABLE `resources` MODIFY COLUMN `state` enum('pending','approved','rejected','DMCA takedown') NOT NULL DEFAULT 'pending';

@@ -3,7 +3,7 @@ import { Link, Outlet } from "@remix-run/react";
 export default function LoginLayout() {
     return <div className="md:grid md:place-content-center h-full">
         <div className="md:relative md:w-max">
-            <div className="bg-white md:shadow-md min-w-full md:min-w-96 rounded-md">
+            <div className="bg-white md:shadow-md min-w-full md:min-w-96 rounded-xl">
                 <div className="p-5">
                     <Outlet />
                 </div>

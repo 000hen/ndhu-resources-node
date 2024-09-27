@@ -2,8 +2,8 @@ import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { count } from "drizzle-orm";
 import ResourceCardComponent from "../../components/resource_card";
 import db from "~/db/client.server";
-import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
-import { classFormat } from "~/utils";
+import { Link, useLoaderData, useRouteLoaderData, useSearchParams } from "@remix-run/react";
+import { classFormat, Premission } from "~/utils";
 import { useRef, useState } from "react";
 import {
     MdAccessTimeFilled,
@@ -22,6 +22,7 @@ import { resources } from "~/db/schema";
 import ResourcePanel from "./panel";
 import { sortByDefault, sortByDownloads, sortByVotes } from "./sql_format.server";
 import { SortBy } from "./resources_interface";
+import { loader as rootLoader } from "~/root";
 
 export const meta: MetaFunction = () => {
     return [
@@ -64,6 +65,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function ResourcesIndex() {
     const data = useLoaderData<typeof loader>();
+    const parentData = useRouteLoaderData<typeof rootLoader>("root");
     const pageNumberRef = useRef<HTMLInputElement>(null);
     const [searchParams, setSearchParams] = useSearchParams();
     const [gridView, setGridView] = useState<boolean>(false);
@@ -117,10 +119,10 @@ export default function ResourcesIndex() {
                                 <MdSearch />
                             </Link>
                         </div>
-                        <Link to={"new"} className="btn btn-success">
+                        {(parentData?.premission || 0) >= Premission.VerifiedUser && <Link to={"new"} className="btn btn-success">
                             <MdAdd className="block" />
                             <span className="hidden sm:block">新增資源</span>
-                        </Link>
+                        </Link>}
                     </div>
                     <div className="flex flex-row">
                         <div className="join md:mr-2">
