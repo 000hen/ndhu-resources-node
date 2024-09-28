@@ -54,6 +54,7 @@ export const action: ActionFunction = async ({ request }) => {
             .values({
                 user_id: sql.placeholder("id"),
                 premission: sql.placeholder("premission"),
+                display: sql.placeholder("display")
             })
             .prepare()
             .execute({
@@ -64,7 +65,7 @@ export const action: ActionFunction = async ({ request }) => {
             });
     }
 
-    if (data.name !== user[0].display) {
+    if (data.name !== user[0].display && user.length) {
         await db
             .update(premissions)
             .set({

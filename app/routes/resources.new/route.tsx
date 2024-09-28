@@ -1,3 +1,3 @@
 export default function ResourceNew() {
-    return <></>
+    return <div></div>
 }

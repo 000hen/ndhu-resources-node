@@ -1,4 +1,4 @@
-import { json, LoaderFunctionArgs, MetaFunction, redirect, TypedResponse } from "@remix-run/node";
+import { ActionFunctionArgs, json, LoaderFunctionArgs, MetaFunction, redirect, TypedResponse } from "@remix-run/node";
 import db from "~/db/client.server";
 import invariant from "tiny-invariant";
 import { ResourceInterface } from "~/types/resource";
@@ -21,7 +21,9 @@ interface ResourceDownloadInterface extends ResourceInterface {
     user_vote: number | null;
 }
 
-export async function loader({ params }: LoaderFunctionArgs): Promise<TypedResponse<ResourceDownloadInterface>> {
+export async function loader({ params, context, request }: LoaderFunctionArgs): Promise<TypedResponse<ResourceDownloadInterface>> {
+    const auth = await getAuthInfoWithPremission({ request, context });
+
     const { id } = params;
     invariant(id, "resource id is required");
 
@@ -38,10 +40,12 @@ export async function loader({ params }: LoaderFunctionArgs): Promise<TypedRespo
                 },
                 category: true,
             },
-            where: (v) => eq(v.id, Number(id)),
+            where: (v) => eq(v.id, sql.placeholder("id")),
         })
         .prepare()
-        .execute();
+        .execute({
+            id: Number(id),
+        });
     
     const userVoteQuery = db
         .query
@@ -49,11 +53,16 @@ export async function loader({ params }: LoaderFunctionArgs): Promise<TypedRespo
         .findFirst({
             columns: {
                 isPush: true,
+                author: true,
             },
-            where: (v) => eq(v.resource, Number(id)),
+            where: (v) => and(eq(v.resource, sql.placeholder("resource")),
+                eq(v.author, sql.placeholder("author"))),
         })
         .prepare()
-        .execute();
+        .execute({
+            resource: Number(id),
+            author: auth.id || "",
+        });
     
     const [resource, userVote] = await Promise.all([resourceQuery, userVoteQuery]);
     
@@ -63,6 +72,8 @@ export async function loader({ params }: LoaderFunctionArgs): Promise<TypedRespo
     const attributes = await Promise.all([
         getResourceSize(resource.storageFilename),
     ]);
+
+    console.log(resource, userVote);
     
     return json({
         id: resource.id,
@@ -86,7 +97,7 @@ export async function loader({ params }: LoaderFunctionArgs): Promise<TypedRespo
     });
 }
 
-export async function action({ request, context, params }: LoaderFunctionArgs) {
+export async function action({ request, context, params }: ActionFunctionArgs) {
     const auth = await getAuthInfoWithPremission({ request, context });
     if (!auth.auth || !auth.id || (auth.premission || 0) < Premission.VerifiedUser)
         return null;
@@ -196,7 +207,6 @@ export default function ResourcePage() {
     const parentData = useRouteLoaderData<typeof rootLoader>("root");
     const navigate = useNavigate();
     const fetcher = useFetcher<typeof action>();
-    const pageLoader = useFetcher<typeof loader>();
 
     useEffect(() => {
         if (fetcher.state === "idle") {
@@ -213,11 +223,12 @@ export default function ResourcePage() {
     }
 
     function vote(type: number) {
+        if (!parentData?.auth)
+            return;
+
         fetcher.submit({}, {
             method: type === 1 ? "put" : "delete",
         });
-
-        pageLoader.load(location.pathname);
     }
 
     return <div className="max-w-full">
@@ -232,7 +243,7 @@ export default function ResourcePage() {
                                 onClick={() => vote(1)}
                                 isVoted={data?.user_vote === 1}
                                 votedMessage={"您已推薦過此資源"}
-                                unvotedMessage={"推薦此資源"} />
+                                unvotedMessage={parentData?.auth ? "推薦此資源" : "登入以對此資源評價"} />
                             
                             <div className="grid place-content-center">
                                 {numberFormat(data.votes.up - data.votes.down)}
@@ -243,7 +254,7 @@ export default function ResourcePage() {
                                 onClick={() => vote(-1)}
                                 isVoted={data?.user_vote === -1}
                                 votedMessage={"您已踩過此資源"}
-                                unvotedMessage={"踩此資源"} />
+                                unvotedMessage={parentData?.auth ? "踩此資源" : "登入以對此資源評價"} />
                         </div>
                     </div>
                 </div>

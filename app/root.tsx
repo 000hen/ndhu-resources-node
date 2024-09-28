@@ -153,7 +153,7 @@ export default function App() {
                                 <div className="w-full">
                                     <h1 className="text-2xl mb-5 px-5 hidden lg:block"><LogoComponent /></h1>
                                     <div className="flex flex-col lg:mt-5">
-                                        <Link to={"/search"} className="btn btn-base-100 w-full justify-start items-center mb-3">
+                                        <Link onClick={toggleMenu} to={"/search"} className="btn btn-base-100 w-full justify-start items-center mb-3">
                                             <MdSearch size={16} className="text-base-content" />
                                             資料搜尋
                                         </Link>
