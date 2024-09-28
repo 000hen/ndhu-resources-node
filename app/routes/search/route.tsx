@@ -20,6 +20,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const query = searchParams.get("q")?.trim();
     const offset = Number(searchParams.get("page") || 1) * 20 - 20;
 
+    const ftsQuery = sql`MATCH(${resources.name}, ${resources.description}, ${resources.tags}, ${resources.upload_by}) AGAINST(${sql.placeholder("query")} IN NATURAL LANGUAGE MODE)`;
+
     if (!query)
         return json({
             type: DataTypes.Suggest,
@@ -32,7 +34,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
             count: count(resources.id)
         })
         .from(resources)
-        .where(sql`MATCH(${resources.name}) AGAINST(${sql.placeholder("query")} IN NATURAL LANGUAGE MODE)`)
+        .where(ftsQuery)
         .prepare()
         .execute({
             query
@@ -51,7 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
                 },
                 category: true,
             },
-            where: sql`MATCH(${resources.name}) AGAINST(${sql.placeholder("query")} IN NATURAL LANGUAGE MODE)`,
+            where: ftsQuery,
             limit: 20,
             offset: sql.placeholder("offset"),
         })

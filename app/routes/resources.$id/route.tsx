@@ -64,7 +64,10 @@ export async function loader({ params, context, request }: LoaderFunctionArgs): 
             author: auth.id || "",
         });
     
-    const [resource, userVote] = await Promise.all([resourceQuery, userVoteQuery]);
+    const [resource, userVote] = await Promise.all([
+        resourceQuery,
+        userVoteQuery,
+    ]);
     
     if (!resource)
         return redirect("/resources");
@@ -72,8 +75,6 @@ export async function loader({ params, context, request }: LoaderFunctionArgs): 
     const attributes = await Promise.all([
         getResourceSize(resource.storageFilename),
     ]);
-
-    console.log(resource, userVote);
     
     return json({
         id: resource.id,
