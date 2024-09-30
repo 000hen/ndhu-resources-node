@@ -1,17 +1,17 @@
-import { ActionFunction, redirect, json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { ActionFunction, redirect, MetaFunction } from "@remix-run/node";
 import { FaGoogle } from "react-icons/fa";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth as clientAuth } from "~/firebase.client";
 import { auth as serverAuth } from "~/firebase.server";
-import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
+import { useFetcher, useNavigate, useRouteLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import cookie from "~/cookies.server";
 import Hr from "~/components/hr";
-import { AuthInfo, getAuthInfo } from "~/utils.server";
 import db from "~/db/client.server";
 import { premissions } from "~/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { checkIsNDHU, Premission } from "~/utils";
+import { loader as rootLoader } from "~/root";
 
 export const meta: MetaFunction = () => {
     return [
@@ -22,10 +22,6 @@ export const meta: MetaFunction = () => {
         },
     ];
 };
-
-export async function loader({ request, context }: LoaderFunctionArgs) {
-    return json<AuthInfo>(await getAuthInfo({ request, context }));
-}
 
 export const action: ActionFunction = async ({ request }) => {
     const form = await request.formData();
@@ -91,7 +87,7 @@ export const action: ActionFunction = async ({ request }) => {
 export default function LoginIndex() {
     const fetcher = useFetcher<typeof action>();
     const navigate = useNavigate();
-    const data = useLoaderData<typeof loader>();
+    const data = useRouteLoaderData<typeof rootLoader>("root");
 
     function sendIdToken(idToken: string) {
         fetcher.submit({ idToken }, { method: "post" });
@@ -113,7 +109,7 @@ export default function LoginIndex() {
             <h1 className="text-4xl text-black">登入/註冊</h1>
         </div>
         {
-            data.auth && <>
+            data?.auth && <>
                 <div className="card shadow-2xl p-3 bg-gray-800">
                     <h2>使用已登入帳號繼續</h2>
                     <div className="w-full grid place-content-center mb-5">

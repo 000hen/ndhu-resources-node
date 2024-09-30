@@ -183,7 +183,7 @@ export default function App() {
                     </div>
                 </div>
             </div>
-        <div className="p-5 lg:p-10 w-full max-h-max">
+        <div className="p-5 lg:p-10 w-full max-h-max lg:min-h-max">
             {page[matches] && <h1 className="text-4xl mb-5 font-bold">{page[matches].display}</h1>}
             <div className="alert alert-warning mb-2">
                 <svg
