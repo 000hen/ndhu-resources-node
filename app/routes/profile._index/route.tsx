@@ -94,6 +94,12 @@ export default function ProfileIndex() {
                 </div>
             </div>
         </CardComponent>
+        <CardComponent>
+            <p className="italic text-gray-500 mb-0 text-sm">
+                您在 Umira Projects 的唯一身分辨識字符為 {data.id} ，此 ID 將用於您於 Umira Projects 的所有服務。
+                有關於我們對您個人資料的使用，請參閱 Umira Projects 的隱私權政策與服務條款。
+            </p>
+        </CardComponent>
 
         <div className="md:grid grid-cols-2">
             <CardComponent title="您貢獻的資源數">
@@ -102,19 +108,19 @@ export default function ProfileIndex() {
             </CardComponent>
             <CardComponent title="已審核成功的資源">
                 <NumberCardFormatComponent bold amount={data.resources?.filter(e => e.state === "approved").length || 0} format="項" />
-                <Link to="resources/accept" className="btn btn-outline mt-2"><MdStorage /> 查看已審核成功的資源</Link>
+                <Link to="resources?action=accept" className="btn btn-outline mt-2"><MdStorage /> 查看已審核成功的資源</Link>
             </CardComponent>
             <CardComponent title="您推過的資源">
-                <NumberCardFormatComponent bold amount={data.pushOrDump?.filter(e => e.isPush).length || 0} format="項" />
-                <Link to="resources/push" className="btn btn-outline m-2"><MdThumbUp /> 查看您推薦過的資源</Link>
+                <NumberCardFormatComponent bold amount={data.pushOrDump?.filter(e => e.isPush > 0).length || 0} format="項" />
+                <Link to="resources?action=push" className="btn btn-outline m-2"><MdThumbUp /> 查看您推薦過的資源</Link>
             </CardComponent>
             <CardComponent title="您踩過的資源">
-                <NumberCardFormatComponent bold amount={data.pushOrDump?.filter(e => !e.isPush).length || 0} format="項" />
-                <Link to="resources/dump" className="btn btn-outline m-2"><MdThumbDown /> 查看您不推薦的資源</Link>
+                <NumberCardFormatComponent bold amount={data.pushOrDump?.filter(e => e.isPush < 0).length || 0} format="項" />
+                <Link to="resources?action=dump" className="btn btn-outline m-2"><MdThumbDown /> 查看您不推薦的資源</Link>
             </CardComponent>
             <CardComponent title="您做出的評論">
                 <NumberCardFormatComponent bold amount={data.comments?.length || 0} format="項" />
-                <Link to="resources/comment" className="btn btn-outline m-2"><MdStorage /> 查看您留言過的資源</Link>
+                <Link to="resources?action=comment" className="btn btn-outline m-2"><MdStorage /> 查看您留言過的資源</Link>
             </CardComponent>
         </div>
     </div>;

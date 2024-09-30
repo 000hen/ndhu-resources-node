@@ -105,7 +105,7 @@ export default function LoginIndex() {
     }
 
     function signUpWithCurrentAccount() {
-        navigate("/dashboard");
+        navigate("/resources");
     }
 
     return <div>

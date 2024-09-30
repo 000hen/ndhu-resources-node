@@ -33,7 +33,7 @@ export function HashTagsFormat({ tags }: { tags?: string[] }) {
 export default function ResourceCardComponent(configs: ResourceCardArgs) {
     const score = (configs.votes?.upvotes || 0) - (configs.votes?.downvotes || 0);
 
-    return <Link to={String(configs.id)} className={classFormat([
+    return <Link to={"/resources/" + String(configs.id)} className={classFormat([
         "card bg-neutral p-5 h-full",
         configs.className
     ])}>

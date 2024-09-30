@@ -2,7 +2,7 @@ import { MetaFunction } from "@remix-run/node";
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "東華資源庫 - 公開資源，節省金援" },
+        { title: "東華資源庫 - 公開資源，一同共享" },
         { name: "description", content: "東華資源庫提供您一個可以下載資源的地方！" },
     ];
 };
@@ -16,7 +16,7 @@ export default function Index() {
         <p>
             請注意！
             依據依著作權法第46條教學之合理使用規定，提供用於教學用途的資源可為合理使用。
-            若您對於我們提供的資源有版權疑慮，或是您希望我們下架您所著作的資源，請聯繫 copyright@muisnowdevs.one ，我們會協助您釐清版權的使用或是刪除/下架該資源。
+            但若您對於我們平台上之資源有版權疑慮，或是您希望我們下架您所著作的資源，請聯繫 copyright@muisnowdevs.one ，我們會協助您釐清版權的使用或是刪除/下架該資源。
         </p>
 
         <h2>開發資訊</h2>

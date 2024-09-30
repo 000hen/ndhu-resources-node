@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
-import { MdSearch } from "react-icons/md";
+import { MdClass, MdDescription, MdSearch } from "react-icons/md";
 import { classFormat } from "~/utils";
 import db from "~/db/client.server";
 import { resources } from "~/db/schema";
@@ -9,10 +9,11 @@ import { useRef, useState } from "react";
 import ResourceCardComponent from "~/components/resource_card";
 import GridViewPanel from "~/components/grid_view_panel";
 import PageViewPanel from "~/components/page_view_panel";
+import JoinedButton from "~/components/joined_button";
 
-enum DataTypes {
-    Suggest = 1 << 0,
-    Result = 1 << 1,
+enum SearchType {
+    Course = "course",
+    Resource = "resource",
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -20,14 +21,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const query = searchParams.get("q")?.trim();
     const offset = Number(searchParams.get("page") || 1) * 20 - 20;
 
-    const ftsQuery = sql`MATCH(${resources.name}, ${resources.description}, ${resources.tags}, ${resources.upload_by}) AGAINST(${sql.placeholder("query")} IN NATURAL LANGUAGE MODE)`;
-
-    if (!query)
+    if (!query || offset < 0)
         return json({
-            type: DataTypes.Suggest,
             length: 0,
             resources: []
         });
+
+    // TODO: Implement search type
+    // const searchType = searchParams.get("searchType") as SearchType || SearchType.Resource;
+
+    const ftsQuery = sql`MATCH(${resources.name}, ${resources.description}, ${resources.tags}, ${resources.upload_by}) AGAINST(${sql.placeholder("query")} IN NATURAL LANGUAGE MODE)`;
     
     const length = await db
         .select({
@@ -64,7 +67,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
         });
 
     return json({
-        type: DataTypes.Result,
         length: length[0].count,
         resources: data.map((e) => ({
             id: e.id,
@@ -100,10 +102,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (!query)
         return null;
 
-    return json({
-        type: DataTypes.Suggest,
-        suggest: await searchSuggestions(query)
-    });
+    return json(await searchSuggestions(query));
 }
 
 async function searchSuggestions(query: string) {
@@ -122,20 +121,34 @@ async function searchSuggestions(query: string) {
 }
 
 export default function Search() {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [gridView, setGridView] = useState<boolean>(false);
     const [suggestVisible, setSuggestVisible] = useState<boolean>(true);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchType, setSearchType] = useState<SearchType>(searchParams.get("searchType") as SearchType || SearchType.Resource);
     const searchBoxRef = useRef<HTMLInputElement>(null);
-    const query = searchParams.get("q")?.trim();
     const fetcher = useFetcher<typeof action>();
     const data = useLoaderData<typeof loader>();
+    
+    const query = searchParams.get("q")?.trim();
 
-    function search(query: string) {
-        setSearchParams({ q: query });
+    function search(query: string, page = 1, type = searchType) {
         setSuggestVisible(false);
+        setSearchParams({
+            q: query,
+            searchType: String(type),
+            page: String(page)
+        });
         
         if (searchBoxRef.current)
             searchBoxRef.current.value = query;
+    }
+
+    function changeSearchType(sort: SearchType) {
+        if (!query)
+            return;
+
+        setSearchType(sort);
+        search(query, undefined, sort);
     }
     
     function suggest(query: string) {
@@ -160,14 +173,13 @@ export default function Search() {
                     type="text"
                     className="grow"
                     onInput={(ele) => suggest(ele.currentTarget.value)}
-                    onBlur={(ele) => search(ele.currentTarget.value)}
                     onKeyUp={(ele) => ele.key === "Enter" && search(ele.currentTarget.value)}/>
             </label>
 
-            {fetcher.data && fetcher.data.suggest.length > 0 && suggestVisible && <div className="card bg-neutral p-5 mt-5">
+            {fetcher.data && fetcher.data.length > 0 && suggestVisible && <div className="card bg-neutral p-5 mt-5">
                 <h2>搜尋建議</h2>
                 <div className="flex flex-row flex-wrap gap-2">
-                    {fetcher.data.suggest.map((v) => <button
+                    {fetcher.data.map((v) => <button
                         className="badge badge-accent"
                         onClick={() => search(v.name)}
                         key={"search:suggest:resource:" + v.id}>
@@ -179,15 +191,27 @@ export default function Search() {
             {query && <div>
                 <GridViewPanel
                     isGridView={gridView}
-                    setGridView={setGridView}/>
+                    setGridView={setGridView}
+                    right={<>
+                        <JoinedButton tips="搜尋課程" isHighlighted={searchType === SearchType.Course} onClick={() => changeSearchType(SearchType.Course)}>
+                            <MdClass />
+                        </JoinedButton>
+                        <JoinedButton tips="搜尋資源" isHighlighted={searchType === SearchType.Resource} onClick={() => changeSearchType(SearchType.Resource)}>
+                            <MdDescription />
+                        </JoinedButton>
+                    </>} />
 
-                <div className={classFormat([
+                {data.resources.length === 0 && <div className="card bg-neutral p-5">
+                    <h2>找不到任何資源</h2>
+                    <p className="mb-0">抱歉！我們找不到任何符合您搜尋的資源。您可以試試看輸入更多關鍵字。</p>
+                </div>}
+                {data.resources.length > 0 && <div className={classFormat([
                     "grid gap-2 grid-cols-1",
                     gridView && "md:grid-cols-2 2xl:grid-cols-3"
                 ])}>
                     {data.resources.map((resource) => {
                         return <ResourceCardComponent
-                            key={"resource:card:" + resource.id}
+                            key={"search:resource:card:" + resource.id}
                             id={resource.id}
                             tags={resource.tags || undefined}
                             votes={{
@@ -201,12 +225,12 @@ export default function Search() {
                             {resource.description && resource.description.length > 250 ? resource.description.slice(0, 250) + "..." : resource.description}
                         </ResourceCardComponent>;
                     })}
-                </div>
+                </div>}
 
                 <PageViewPanel
                     size={data.length}
                     currentPage={Number(searchParams.get("page") || 1)}
-                    changePage={(page) => setSearchParams({ p: query, page: String(page) })} />
+                    changePage={(page) => search(query, page)} />
             </div>}
         </div>
     </div>;

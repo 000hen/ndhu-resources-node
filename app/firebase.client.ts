@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getAuth, setPersistence, indexedDBLocalPersistence } from "firebase/auth";
 
 const app = initializeApp({
-    apiKey: "AIzaSyDBUkMFDIKSYJEwp5LHkUlbYjpcNRo0kd8",
-    authDomain: "auth.umira.moe",
-    projectId: "forward-fuze-348810",
-    storageBucket: "forward-fuze-348810.appspot.com",
-    messagingSenderId: "718744958282",
-    appId: "1:718744958282:web:8a9f379de76f716284bdb3",
-    measurementId: "G-BV183G1KJZ",
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 });
 
 const auth = getAuth(app);

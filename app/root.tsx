@@ -176,7 +176,7 @@ export default function App() {
                                                 <MdAdminPanelSettings size={25} />
                                             </FooterButtonComponent>}
                                     </div>
-                                    <p className="mt-2 text-center">© 2024 Umira Projects</p>
+                                    <p className="mt-2 text-center mb-0">© 2024 Umira Projects</p>
                                 </div>
                             </div>
                         </div>
