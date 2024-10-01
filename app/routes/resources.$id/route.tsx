@@ -277,7 +277,8 @@ export default function ResourcePage() {
                             </div>
                         </div>
                         <div className="mt-5 min-w-max">
-                            {data.state == "pending" && <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">檔案正在審核中，暫時不開放下載</button>}
+                            {(data.state == "pending" || data.state == "uploading")
+                                && <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">檔案正在審核中，暫時不開放下載</button>}
                             {data.state == "rejected" && <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">檔案已被拒絕，您無法下載</button>}
                             {data.state == "DMCA takedown" && <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">因版權問題已被下架，您無法下載</button>}
                             {data.state == "approved" && <>

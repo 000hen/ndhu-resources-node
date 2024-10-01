@@ -1,0 +1,726 @@
+{
+  "version": "5",
+  "dialect": "mysql",
+  "id": "baf4d012-3f52-42ef-8371-77735145895c",
+  "prevId": "62be943f-02e9-4950-b30b-098e4e4bc518",
+  "tables": {
+    "comments": {
+      "name": "comments",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "parent": {
+          "name": "parent",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "author": {
+          "name": "author",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "resource": {
+          "name": "resource",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "create_at": {
+          "name": "create_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "comments_author_idx": {
+          "name": "comments_author_idx",
+          "columns": [
+            "author"
+          ],
+          "isUnique": false
+        },
+        "comments_resource_idx": {
+          "name": "comments_resource_idx",
+          "columns": [
+            "resource"
+          ],
+          "isUnique": false
+        },
+        "comments_author_resource_idx": {
+          "name": "comments_author_resource_idx",
+          "columns": [
+            "author",
+            "resource"
+          ],
+          "isUnique": false
+        },
+        "comments_create_at_idx": {
+          "name": "comments_create_at_idx",
+          "columns": [
+            "create_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "comments_author_premissions_user_id_fk": {
+          "name": "comments_author_premissions_user_id_fk",
+          "tableFrom": "comments",
+          "tableTo": "premissions",
+          "columnsFrom": [
+            "author"
+          ],
+          "columnsTo": [
+            "user_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "comments_resource_resources_id_fk": {
+          "name": "comments_resource_resources_id_fk",
+          "tableFrom": "comments",
+          "tableTo": "resources",
+          "columnsFrom": [
+            "resource"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "comments_parent_fk": {
+          "name": "comments_parent_fk",
+          "tableFrom": "comments",
+          "tableTo": "comments",
+          "columnsFrom": [
+            "parent"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "comments_id": {
+          "name": "comments_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "courses": {
+      "name": "courses",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "display_id": {
+          "name": "display_id",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teacher": {
+          "name": "teacher",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "courses_name_idx": {
+          "name": "courses_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "courses_teacher_idx": {
+          "name": "courses_teacher_idx",
+          "columns": [
+            "teacher"
+          ],
+          "isUnique": false
+        },
+        "courses_name_teacher_idx": {
+          "name": "courses_name_teacher_idx",
+          "columns": [
+            "name",
+            "teacher"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "courses_id": {
+          "name": "courses_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "courses_display_id_unique": {
+          "name": "courses_display_id_unique",
+          "columns": [
+            "display_id"
+          ]
+        }
+      }
+    },
+    "premissions": {
+      "name": "premissions",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "display": {
+          "name": "display",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        },
+        "premission": {
+          "name": "premission",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 2
+        }
+      },
+      "indexes": {
+        "premissions_premission_idx": {
+          "name": "premissions_premission_idx",
+          "columns": [
+            "premission"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "premissions_user_id": {
+          "name": "premissions_user_id",
+          "columns": [
+            "user_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "pushOrDump": {
+      "name": "pushOrDump",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "author": {
+          "name": "author",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "resource": {
+          "name": "resource",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "is_push": {
+          "name": "is_push",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "create_at": {
+          "name": "create_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "push_or_dump_author_idx": {
+          "name": "push_or_dump_author_idx",
+          "columns": [
+            "author"
+          ],
+          "isUnique": false
+        },
+        "push_or_dump_resource_idx": {
+          "name": "push_or_dump_resource_idx",
+          "columns": [
+            "resource"
+          ],
+          "isUnique": false
+        },
+        "push_or_dump_author_resource_idx": {
+          "name": "push_or_dump_author_resource_idx",
+          "columns": [
+            "author",
+            "resource"
+          ],
+          "isUnique": false
+        },
+        "push_or_dump_resource_ispush_idx": {
+          "name": "push_or_dump_resource_ispush_idx",
+          "columns": [
+            "resource",
+            "is_push"
+          ],
+          "isUnique": false
+        },
+        "push_or_dump_create_at_idx": {
+          "name": "push_or_dump_create_at_idx",
+          "columns": [
+            "create_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "pushOrDump_author_premissions_user_id_fk": {
+          "name": "pushOrDump_author_premissions_user_id_fk",
+          "tableFrom": "pushOrDump",
+          "tableTo": "premissions",
+          "columnsFrom": [
+            "author"
+          ],
+          "columnsTo": [
+            "user_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "pushOrDump_resource_resources_id_fk": {
+          "name": "pushOrDump_resource_resources_id_fk",
+          "tableFrom": "pushOrDump",
+          "tableTo": "resources",
+          "columnsFrom": [
+            "resource"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "pushOrDump_id": {
+          "name": "pushOrDump_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "resourceCategory": {
+      "name": "resourceCategory",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "create_at": {
+          "name": "create_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "resource_category_name_idx": {
+          "name": "resource_category_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "resource_category_id_name_idx": {
+          "name": "resource_category_id_name_idx",
+          "columns": [
+            "id",
+            "name"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "resourceCategory_id": {
+          "name": "resourceCategory_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "resourceCategory_name_unique": {
+          "name": "resourceCategory_name_unique",
+          "columns": [
+            "name"
+          ]
+        }
+      }
+    },
+    "resourceDownloaded": {
+      "name": "resourceDownloaded",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "author": {
+          "name": "author",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "resource": {
+          "name": "resource",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "create_at": {
+          "name": "create_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "resource_downloaded_author_idx": {
+          "name": "resource_downloaded_author_idx",
+          "columns": [
+            "author"
+          ],
+          "isUnique": false
+        },
+        "resource_downloaded_resource_idx": {
+          "name": "resource_downloaded_resource_idx",
+          "columns": [
+            "resource"
+          ],
+          "isUnique": false
+        },
+        "resource_downloaded_author_resource_idx": {
+          "name": "resource_downloaded_author_resource_idx",
+          "columns": [
+            "author",
+            "resource"
+          ],
+          "isUnique": false
+        },
+        "resource_downloaded_create_at_idx": {
+          "name": "resource_downloaded_create_at_idx",
+          "columns": [
+            "create_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "resourceDownloaded_author_premissions_user_id_fk": {
+          "name": "resourceDownloaded_author_premissions_user_id_fk",
+          "tableFrom": "resourceDownloaded",
+          "tableTo": "premissions",
+          "columnsFrom": [
+            "author"
+          ],
+          "columnsTo": [
+            "user_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "resourceDownloaded_resource_resources_id_fk": {
+          "name": "resourceDownloaded_resource_resources_id_fk",
+          "tableFrom": "resourceDownloaded",
+          "tableTo": "resources",
+          "columnsFrom": [
+            "resource"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "resourceDownloaded_id": {
+          "name": "resourceDownloaded_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "resources": {
+      "name": "resources",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "courses": {
+          "name": "courses",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "filename": {
+          "name": "filename",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "storage_filename": {
+          "name": "storage_filename",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tags": {
+          "name": "tags",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "upload_by": {
+          "name": "upload_by",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "create_at": {
+          "name": "create_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "state": {
+          "name": "state",
+          "type": "enum('uploading','pending','approved','rejected','DMCA takedown')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'uploading'"
+        }
+      },
+      "indexes": {
+        "resources_name_idx": {
+          "name": "resources_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "resources_course_idx": {
+          "name": "resources_course_idx",
+          "columns": [
+            "courses"
+          ],
+          "isUnique": false
+        },
+        "resources_uploader_idx": {
+          "name": "resources_uploader_idx",
+          "columns": [
+            "upload_by"
+          ],
+          "isUnique": false
+        },
+        "resources_create_at_idx": {
+          "name": "resources_create_at_idx",
+          "columns": [
+            "create_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "resources_courses_courses_id_fk": {
+          "name": "resources_courses_courses_id_fk",
+          "tableFrom": "resources",
+          "tableTo": "courses",
+          "columnsFrom": [
+            "courses"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "resources_upload_by_premissions_user_id_fk": {
+          "name": "resources_upload_by_premissions_user_id_fk",
+          "tableFrom": "resources",
+          "tableTo": "premissions",
+          "columnsFrom": [
+            "upload_by"
+          ],
+          "columnsTo": [
+            "user_id"
+          ],
+          "onDelete": "set default",
+          "onUpdate": "no action"
+        },
+        "resources_type_resourceCategory_id_fk": {
+          "name": "resources_type_resourceCategory_id_fk",
+          "tableFrom": "resources",
+          "tableTo": "resourceCategory",
+          "columnsFrom": [
+            "type"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "resources_id": {
+          "name": "resources_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "resources_filename_unique": {
+          "name": "resources_filename_unique",
+          "columns": [
+            "filename"
+          ]
+        },
+        "resources_storage_filename_unique": {
+          "name": "resources_storage_filename_unique",
+          "columns": [
+            "storage_filename"
+          ]
+        }
+      }
+    }
+  },
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {},
+    "indexes": {}
+  }
+}

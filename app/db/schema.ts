@@ -85,9 +85,9 @@ export const resources = mysqlTable("resources", {
     create_at: timestamp("create_at")
         .notNull()
         .default(sql`CURRENT_TIMESTAMP`),
-    state: mysqlEnum("state", ["pending", "approved", "rejected", "DMCA takedown"])
+    state: mysqlEnum("state", ["uploading", "pending", "approved", "rejected", "DMCA takedown"])
         .notNull()
-        .default("pending"),
+        .default("uploading"),
 }, resources => ({
     name_idx: index("resources_name_idx").on(resources.name),
     course_idx: index("resources_course_idx").on(resources.courses),
