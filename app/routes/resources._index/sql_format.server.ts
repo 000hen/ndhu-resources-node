@@ -92,6 +92,7 @@ async function sortByPopularity(popularity: SortByPopularity): Promise<ResourceI
         create_at: e.resources.create_at,
         state: e.resources.state,
         course: e.courses,
+        filename: e.resources.filename,
         votes: {
             up: pushOrDumps.find((v) => v.resource === e.resources.id)?.upvotes || 0,
             down: pushOrDumps.find((v) => v.resource === e.resources.id)?.downvotes || 0,
@@ -168,6 +169,7 @@ export async function sortByDefault(mode: SortBy, offset: number): Promise<Resou
         create_at: e.create_at,
         state: e.state,
         course: e.course,
+        filename: e.filename,
         votes: {
             up: e.pushOrDump.filter((v) => v.isPush > 0).length,
             down: e.pushOrDump.filter((v) => v.isPush < 0).length,

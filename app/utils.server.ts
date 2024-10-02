@@ -4,15 +4,24 @@ import { auth as serverAuth } from "./firebase.server";
 import cookie from "./cookies.server";
 import db from "./db/client.server";
 import { eq, sql } from "drizzle-orm";
+import crypto from "crypto";
 
 interface CheckLoginArgs {
     request: Request,
     context: AppLoadContext
 }
 
+export interface AuthedInfo {
+    auth: true,
+    display: string,
+    email?: string,
+    profile?: string,
+    via: string,
+    id: string
+}
 export type AuthInfo =
     | { auth: false }
-    | { auth: true, display: string, email?: string, profile?: string, via: string, id: string }    
+    | AuthedInfo    
 
 export type AuthInfoWithPremission = AuthInfo & { premission: number }
 
@@ -82,3 +91,39 @@ export async function getAuthInfoWithPremission({ request, context }: { request:
         premission: premission?.premission || 0
     };
 }
+
+const getValidationKey = () => {
+    const key = process.env.VALIDATION_SECRET;
+    if (!key) throw new Error("No validation secret found");
+    return crypto.createHash("sha256").update(key).digest();
+};
+
+const getBinaryDataHash = (data: string) => crypto
+    .createHash("sha256")
+    .update(Buffer.from(data, "utf-8"))
+    .digest();
+
+export const createServerValidation = (data: string) => {
+    const dataHash = getBinaryDataHash(data);
+    const binaryKey = getValidationKey();
+    const iv = crypto.randomBytes(16);
+    const signature = crypto
+        .createCipheriv("aes-256-cbc", binaryKey, iv)
+        .update(dataHash);
+
+    return signature.toString("base64") + iv.toString("hex");
+};
+
+export const validateServerValidation = (data: string, signature: string): boolean => {
+    const dataHash = getBinaryDataHash(data);
+    const binaryKey = getValidationKey();
+    const iv = Buffer.from(signature.slice(-32), "hex");
+    const signatureData = Buffer.from(signature.slice(0, -32), "base64");
+    const decipher = crypto.createDecipheriv("aes-256-cbc", binaryKey, iv);
+    decipher.setAutoPadding(false);
+
+    let deciphered = decipher.update(signatureData);
+    deciphered = Buffer.concat([deciphered, decipher.final()]);
+
+    return Buffer.compare(deciphered, dataHash) === 0;
+};

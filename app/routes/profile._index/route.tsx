@@ -1,7 +1,7 @@
 import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { eq, sql } from "drizzle-orm";
-import { MdEdit, MdLocalPolice, MdLogout, MdStorage, MdThumbDown, MdThumbUp, MdVerified } from "react-icons/md";
+import { MdEdit, MdLocalPolice, MdLogout, MdNoAccounts, MdStorage, MdThumbDown, MdThumbUp, MdVerified } from "react-icons/md";
 import CardComponent from "~/components/card";
 import IconBadgeComponent from "./icon_badge";
 import NumberCardFormatComponent from "~/components/number_card_format";
@@ -67,6 +67,12 @@ export default function ProfileIndex() {
                                 {data.display}
                                 
                                 <div>
+                                    {premissions <= Premission.Disabled && <IconBadgeComponent
+                                        icon={MdNoAccounts}
+                                        className="text-error">
+                                        您的帳戶已被停用，您可能違反了我們的服務條款
+                                    </IconBadgeComponent>}
+
                                     {checkIsNDHU(data.email || "@") && premissions >= Premission.VerifiedUser
                                         && <IconBadgeComponent
                                         icon={MdVerified}

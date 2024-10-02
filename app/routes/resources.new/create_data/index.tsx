@@ -14,9 +14,9 @@ export default function CreateDataIndex({ data: uploadData, setData: setUploadDa
         description: "",
         tags: null,
         course: null,
-        category: null
+        category: null,
+        filename: "",
     });
-    const [courseSelected, setCourseSelected] = useState<Course | null>(state.course);
     const [showCourseSearch, setShowCourseSearch] = useState(false);
     const data = useLoaderData<typeof loader>();
     const fetcher = useFetcher<typeof action>();
@@ -35,7 +35,6 @@ export default function CreateDataIndex({ data: uploadData, setData: setUploadDa
 
     function setCourse(course: Course) {
         dispatch({ type: ActionType.SET_COURSE, payload: course });
-        setCourseSelected(course);
         setShowCourseSearch(false);
         setCourseSearchValue(course.name);
     }
@@ -46,7 +45,7 @@ export default function CreateDataIndex({ data: uploadData, setData: setUploadDa
             && state.category
             && state.course) {
             setIsAbleToNext(true);
-            setUploadData({ ...state, file: null });
+            setUploadData({ ...state, file: uploadData?.file || null });
             return;
         }
 
@@ -112,8 +111,8 @@ export default function CreateDataIndex({ data: uploadData, setData: setUploadDa
                             type="text"
                             className="input input-bordered input-lg bg-neutral w-full md:w-96"
                             placeholder="輸入課程名稱或導師名稱"
-                            defaultValue={courseSelected?.name}
-                            onBlur={() => setCourseSearchValue(courseSelected?.name || "")}
+                            defaultValue={state.course?.name}
+                            onBlur={() => setCourseSearchValue(state.course?.name || "")}
                             onInput={(e) => suggest(e.currentTarget.value)} />
 
                         {showCourseSearch && fetcher.data && <div className="md:w-96 w-full py-2">

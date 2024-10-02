@@ -4,6 +4,7 @@ export interface UploadResourceInterface {
     tags: string[] | null;
     course: Course | null;
     category: string | null;
+    filename: string;
 }
 
 export interface ResourceInterface extends Omit<UploadResourceInterface, 'category'> {
