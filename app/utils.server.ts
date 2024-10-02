@@ -10,14 +10,11 @@ interface CheckLoginArgs {
     context: AppLoadContext
 }
 
-export interface AuthInfo {
-    auth: boolean,
-    id?: string,
-    display?: string,
-    email?: string,
-    profile?: string,
-    via?: string
-}
+export type AuthInfo =
+    | { auth: false }
+    | { auth: true, display: string, email?: string, profile?: string, via: string, id: string }    
+
+export type AuthInfoWithPremission = AuthInfo & { premission: number }
 
 export function redirectToLogin(request: Request) {
     return redirect("/login?return=" + encodeURIComponent(new URL(request.url).pathname));
@@ -64,7 +61,7 @@ export async function getAuthInfo({ request, context }: { request: Request, cont
     };
 }
 
-export async function getAuthInfoWithPremission({ request, context }: { request: Request, context: AppLoadContext }) {
+export async function getAuthInfoWithPremission({ request, context }: { request: Request, context: AppLoadContext }): Promise<AuthInfoWithPremission> {
     const auth = await getAuthInfo({ request, context });
     const premission = await db
         .query
@@ -77,11 +74,11 @@ export async function getAuthInfoWithPremission({ request, context }: { request:
         })
         .prepare()
         .execute({
-            id: auth.id || ""
+            id: (auth.auth && auth.id) || ""
         });
 
     return {
         ...auth,
-        ...premission
+        premission: premission?.premission || 0
     };
 }

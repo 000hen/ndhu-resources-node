@@ -7,7 +7,7 @@ import IconBadgeComponent from "./icon_badge";
 import NumberCardFormatComponent from "~/components/number_card_format";
 import db from "~/db/client.server";
 import { checkIsNDHU, googleImageResize, Premission } from "~/utils";
-import { getAuthInfo } from "~/utils.server";
+import { getAuthInfoWithPremission, redirectToLogin } from "~/utils.server";
 
 export const meta: MetaFunction = () => {
     return [
@@ -17,7 +17,11 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
-    const auth = await getAuthInfo({ request, context });
+    const auth = await getAuthInfoWithPremission({ request, context });
+
+    if (!auth.auth)
+        return redirectToLogin(request);
+
     const user = await db
         .query
         .premissions
@@ -35,7 +39,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
         })
         .prepare()
         .execute({
-            id: auth.id || ""
+            id: auth.id
         });
 
     return json({

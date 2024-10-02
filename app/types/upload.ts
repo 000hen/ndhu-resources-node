@@ -1,7 +1,7 @@
 import { ActionFunctionArgs } from "@remix-run/node";
-import { ResourceInterface } from "./resource";
+import { UploadResourceInterface } from "./resource";
 
-export interface DataUpload extends ResourceInterface {
+export interface DataUpload extends UploadResourceInterface {
     file: File | null,
 }
 

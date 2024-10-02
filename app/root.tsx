@@ -24,14 +24,12 @@ import PanelLink from "./components/panel_link";
 import { IconType } from "react-icons";
 import LogoComponent from "./components/logo";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { AuthInfo, getAuthInfo } from "./utils.server";
-
-import "./tailwind.css";
+import { AuthInfo, getAuthInfoWithPremission } from "./utils.server";
 import { FaUser } from "react-icons/fa";
 import { googleImageResize, Premission } from "./utils";
-import db from "./db/client.server";
-import { eq, sql } from "drizzle-orm";
 import FooterButtonComponent from "./components/footer_button";
+
+import "./tailwind.css";
 
 interface PanelNaviagePage {
     display: string,
@@ -45,25 +43,9 @@ interface Pages {
 }
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
-    const auth = await getAuthInfo({ request, context });
-    const premission = await db
-        .query
-        .premissions
-        .findFirst({
-            columns: {
-                premission: true
-            },
-            where: (v) => eq(v.user_id, sql.placeholder("id")),
-        })
-        .prepare()
-        .execute({
-            id: auth.id || ""
-        });
+    const auth = await getAuthInfoWithPremission({ request, context });
 
-    return json({
-        ...auth,
-        ...premission
-    });
+    return json(auth);
 }
 
 function pages(auth: AuthInfo): Pages {
@@ -107,10 +89,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     );
 }
 
-function ProfileImage(url: string | null, username: string) {
-    if (!url)
-        return <FaUser size={40} />;
-
+function ProfileImage(url: string, username: string) {
     const headerImg = googleImageResize(url || "", 40);
 
     return <div className="tooltip tooltip-left lg:tooltip-bottom" data-tip={`登入為 ${username}`}>
@@ -124,8 +103,8 @@ export default function App() {
 
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const page = pages(data);
-    const profileImg = ProfileImage(data.profile ?? null, data.display || "");
-    const premissions = data.premission || 0;
+    const profileImg = data.auth ? ProfileImage(data.profile || "", data.display) : <FaUser size={40} />;
+    const premissions = data.auth ? data.premission : 0;
 
     function toggleMenu() {
         setShowMenu((e) => !e);

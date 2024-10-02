@@ -61,7 +61,7 @@ export async function loader({ params, context, request }: LoaderFunctionArgs): 
         .prepare()
         .execute({
             resource: Number(id),
-            author: auth.id || "",
+            author: (auth.auth && auth.id) || "",
         });
     
     const [resource, userVote] = await Promise.all([
@@ -100,7 +100,7 @@ export async function loader({ params, context, request }: LoaderFunctionArgs): 
 
 export async function action({ request, context, params }: ActionFunctionArgs) {
     const auth = await getAuthInfoWithPremission({ request, context });
-    if (!auth.auth || !auth.id || (auth.premission || 0) < Premission.VerifiedUser)
+    if (!auth.auth || (auth.premission || 0) < Premission.VerifiedUser)
         return null;
 
     const { id } = params;

@@ -2,8 +2,8 @@ import { ActionFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import ResourcePanel from "~/components/panel";
 import { MdArrowLeft, MdArrowRight, MdCheck } from "react-icons/md";
-import { DataUpload, DataUploadElementProps } from "~/types/upload";
-import { useState } from "react";
+import { DataUpload } from "~/types/upload";
+import { useEffect, useState } from "react";
 import stepsElementRunners from "./steps";
 import stepsRunners from "./steps.server";
 import { classFormat, Premission } from "~/utils";
@@ -37,16 +37,6 @@ export async function action(actionArgs: ActionFunctionArgs) {
     return (stepsRunners[Number(step) - 1] ?? { action: () => null }).action(actionArgs);
 }
 
-interface CreateStepsProps extends DataUploadElementProps {
-    currentStep: number,
-}
-
-function CreateSteps({ currentStep, data, setData, setIsAbleToNext }: CreateStepsProps) {
-    const StepElement = stepsElementRunners[currentStep - 1];
-
-    return <StepElement data={data} setData={setData} setIsAbleToNext={setIsAbleToNext} />;
-}
-
 function stepClass(step: number, currentStep: number) {
     return classFormat([
         "step",
@@ -56,10 +46,12 @@ function stepClass(step: number, currentStep: number) {
 
 export default function ResourceNewIndex() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const [isAbleToNext, setIsAbleToNext] = useState<boolean>(false);
     const [data, setData] = useState<DataUpload | null>(null);
-    const [isAbleToNext, setIsAbleToNext] = useState(false);
     const step = Number(searchParams.get("step") || "1");
     const navigate = useNavigate();
+
+    const StepElement = stepsElementRunners[step - 1];
 
     function changePage(step: number) {
         if (step > 3) {
@@ -68,7 +60,18 @@ export default function ResourceNewIndex() {
         }
 
         setSearchParams({ step: step.toString() });
+        setIsAbleToNext(false);
     }
+
+    function setAbleToNext(isAbleToNext: boolean) {
+        setIsAbleToNext(isAbleToNext);
+    }
+
+    useEffect(() => {
+        if (data === null && step !== 1) {
+            setSearchParams({ step: "1" });
+        }
+    }, [data, step, setSearchParams]);
 
     return <div>
         <ul className="steps steps-horizontal w-full mb-5">
@@ -78,11 +81,10 @@ export default function ResourceNewIndex() {
             <li className={stepClass(4, step)}>完成上傳</li>
         </ul>
 
-        <CreateSteps
-            currentStep={step}
+        <StepElement
             data={data}
             setData={setData}
-            setIsAbleToNext={setIsAbleToNext} />
+            setIsAbleToNext={setAbleToNext} />
 
         <ResourcePanel className="mt-5">
             <div className="w-full flex justify-between">

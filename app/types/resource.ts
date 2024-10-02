@@ -1,12 +1,16 @@
-export interface ResourceInterface {
-    id: number;
+export interface UploadResourceInterface {
     name: string;
     description: string | null;
     tags: string[] | null;
+    course: Course | null;
+    category: string | null;
+}
+
+export interface ResourceInterface extends Omit<UploadResourceInterface, 'category'> {
+    id: number;
     upload_by: string;
     create_at: Date;
     state: string;
-    course: Course | null;
     votes: Votes;
     category: Category | null;
 }
