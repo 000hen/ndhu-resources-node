@@ -163,7 +163,7 @@ export default function Search() {
         "w-full h-full mt-20 lg:mt-0",
         !query && "grid place-content-center",
     ])}>
-        <div>
+        <div className="min-w-0">
             <h1>您好！您想要找尋甚麼檔案？ </h1>
             <label className="input rounded-full flex items-center gap-2 border-0 bg-neutral">
                 <MdSearch />
@@ -178,9 +178,9 @@ export default function Search() {
 
             {fetcher.data && fetcher.data.length > 0 && suggestVisible && <div className="card bg-neutral p-5 mt-5">
                 <h2>搜尋建議</h2>
-                <div className="flex flex-row flex-wrap gap-2">
+                <div className="flex flex-row flex-wrap gap-2 w-fit max-w-full">
                     {fetcher.data.map((v) => <button
-                        className="badge badge-accent"
+                        className="badge badge-accent truncate justify-start overflow-hidden"
                         onClick={() => search(v.name)}
                         key={"search:suggest:resource:" + v.id}>
                         {v.name}

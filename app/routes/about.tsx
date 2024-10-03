@@ -1,5 +1,13 @@
+import { MetaFunction } from "@remix-run/node";
 import LogoComponent from "~/components/logo";
 import { version } from "~/../package.json";
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: "關於平台 - 東華資源庫" },
+        { name: "description", content: "關於東華資源庫的資訊" },
+    ];
+};
 
 export default function AboutIndex() {
     return <div>

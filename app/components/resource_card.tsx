@@ -69,7 +69,7 @@ export default function ResourceCardComponent(configs: ResourceCardArgs) {
                         {configs.category && <span className="flex items-center text-lg"><MdCategory className="inline mr-2" />{configs.category}</span>}
                     </div>
                 </div>
-                {configs.children && <p className="mt-5">{configs.children}</p>}
+                {configs.children && <p className="mt-5 mb-0">{configs.children}</p>}
             </div>
         </div>
     </Link>;

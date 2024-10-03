@@ -43,6 +43,12 @@ export default function FileUploadIndex({ data, setIsAbleToNext }: DataUploadEle
     }
 
     useEffect(() => {
+        if (state.currentState !== FileUploadState.Done && state.currentState !== FileUploadState.Failed) {
+            window.onbeforeunload = () => "檔案上傳中，確定要離開嗎？";
+        } else {
+            window.onbeforeunload = null;
+        }
+
         switch (state.currentState) {
             case FileUploadState.Pending:
                 return submitData();
