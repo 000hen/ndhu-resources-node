@@ -1,9 +1,10 @@
 import { UploadResourceInterface } from "~/types/resource";
 
-export enum FileUploadType {
-    Pending   = 1 << 0,
-    Uploading = 1 << 1,
-    Done      = 1 << 2,
+export enum FileUploadState {
+    Pending   = 0,
+    Uploading = 1,
+    Done      = 2,
+    Failed    = -1,
 }
 
 export enum ClientActionType {
@@ -25,30 +26,29 @@ export interface ServerUploadResponse {
     validate: string,
 }
 
-export interface RequestPreSignedPUT {
-    resourceid: number,
-    uploadid: string,
-    fileid: string,
+export interface RequestPreSignedPUT extends ServerUploadResponse {
     part: number,
-    validate: string,
 }
 
 export interface ServerPreSignedPUT {
     url: string,
 }
 
-export interface RequestUploadDone {
-    resourceid: number,
-    uploadid: string,
-    fileid: string,
-    validate: string,
-    parts: { ETag: string, PartNumber: number }[],
+export interface UploadParts {
+    ETag: string,
+    PartNumber: number
 }
 
-export type ServerAction =
+export interface RequestUploadDone extends ServerUploadResponse {
+    parts: UploadParts[],
+}
+
+export type ClientAction =
     | { type: ClientActionType.RequestUpload, payload: UploadResourceInterface }
-    | { type: ServerActionType.ServerUploadResponse, payload: ServerUploadResponse }
     | { type: ClientActionType.RequestPreSignedPUT, payload: RequestPreSignedPUT }
+    | { type: ClientActionType.RequestUploadDone, payload: RequestUploadDone };
+
+export type ServerAction =
+    | { type: ServerActionType.ServerUploadResponse, payload: ServerUploadResponse }
     | { type: ServerActionType.ServerPreSignedPUT, payload: ServerPreSignedPUT }
-    | { type: ClientActionType.RequestUploadDone, payload: RequestUploadDone }
     | { type: ServerActionType.ServerUploadDone };

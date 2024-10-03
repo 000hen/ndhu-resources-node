@@ -15,6 +15,10 @@ const stepsRunners: StepsRunner[] = [
         loader: () => Promise.resolve(null),
         action: fileUploadAction,
     },
+    {
+        loader: () => Promise.resolve(null),
+        action: () => Promise.resolve(null),
+    },
 ];
 
 export default stepsRunners;

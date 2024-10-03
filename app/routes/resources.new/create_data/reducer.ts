@@ -1,12 +1,6 @@
 import { Course, UploadResourceInterface } from "~/types/resource";
 
 // TODO: Add reducer logic for the create_data page
-export type Action =
-    | { type: ActionType.SET_NAME, payload: string }
-    | { type: ActionType.SET_DESCRIPTION, payload: string }
-    | { type: ActionType.SET_TAGS, payload: string[] }
-    | { type: ActionType.SET_COURSE, payload: Course }
-    | { type: ActionType.SET_CATEGORY, payload: string };
 export enum ActionType {
     SET_NAME,
     SET_DESCRIPTION,
@@ -14,6 +8,12 @@ export enum ActionType {
     SET_COURSE,
     SET_CATEGORY,
 }
+export type Action =
+    | { type: ActionType.SET_NAME, payload: string }
+    | { type: ActionType.SET_DESCRIPTION, payload: string }
+    | { type: ActionType.SET_TAGS, payload: string[] }
+    | { type: ActionType.SET_COURSE, payload: Course }
+    | { type: ActionType.SET_CATEGORY, payload: string };
 
 export function reducer(state: UploadResourceInterface, action: Action): UploadResourceInterface {
     switch (action.type) {

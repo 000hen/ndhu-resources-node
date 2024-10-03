@@ -1,8 +1,10 @@
 import { ActionFunctionArgs } from "@remix-run/node";
 import { UploadResourceInterface } from "./resource";
 
+export const CHUNK_SIZE = 20971520; // 20MB
 export interface DataUpload extends UploadResourceInterface {
     file: File | null,
+    chunkLength: number,
 }
 
 export interface DataUploadElementProps {

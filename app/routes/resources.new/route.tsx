@@ -54,7 +54,7 @@ export default function ResourceNewIndex() {
     const StepElement = stepsElementRunners[step - 1];
 
     function changePage(step: number) {
-        if (step >= 4) {
+        if (step > 4) {
             navigate("/resources");
             return;
         }

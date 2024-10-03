@@ -15,6 +15,7 @@ import {
     MdClose,
     MdDescription,
     MdGroups,
+    MdInfo,
     MdLogin,
     MdLogout,
     MdMenu,
@@ -155,7 +156,7 @@ export default function App() {
                                                 <MdAdminPanelSettings size={25} />
                                             </FooterButtonComponent>}
                                     </div>
-                                    <p className="mt-2 text-center mb-0">© 2024 Umira Projects</p>
+                                    <p className="mt-2 text-center mb-0">© 2024 Umira Projects <Link to={"/about"} className="tooltip" data-tip="關於這個平台"><MdInfo className="inline" /></Link></p>
                                 </div>
                             </div>
                         </div>

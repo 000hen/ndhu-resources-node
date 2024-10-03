@@ -1,5 +1,5 @@
 import RequiredSign from "~/components/reqired_sign";
-import { DataUploadElementProps } from "~/types/upload";
+import { CHUNK_SIZE, DataUploadElementProps } from "~/types/upload";
 import UploadFile from "./upload_file";
 import FileSelected from "./file_selected";
 import { useEffect } from "react";
@@ -9,14 +9,25 @@ export default function SelectFileIndex({ data: uploadData, setData: setUploadDa
         if (!uploadData)
             return;
 
-        setUploadData({ ...uploadData, file, filename: file.name });
+        setUploadData({
+            ...uploadData,
+            file,
+            filename: file.name,
+            chunkLength: Math.ceil(file.size / CHUNK_SIZE),
+        });
     }
+
+    console.log(uploadData);
 
     function reselect() {
         if (!uploadData)
             return;
 
-        setUploadData({ ...uploadData, file: null });
+        setUploadData({
+            ...uploadData,
+            file: null,
+            chunkLength: 0
+        });
     }
 
     useEffect(() => {

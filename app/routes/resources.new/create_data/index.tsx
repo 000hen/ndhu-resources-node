@@ -45,7 +45,11 @@ export default function CreateDataIndex({ data: uploadData, setData: setUploadDa
             && state.category
             && state.course) {
             setIsAbleToNext(true);
-            setUploadData({ ...state, file: uploadData?.file || null });
+            setUploadData({
+                ...state,
+                file: uploadData?.file || null,
+                chunkLength: uploadData?.chunkLength || 0,
+            });
             return;
         }
 

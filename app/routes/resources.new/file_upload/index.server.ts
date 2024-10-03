@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, json } from "@remix-run/node";
+import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { Premission } from "~/utils";
 import { AuthedInfo, createServerValidation, getAuthInfoWithPremission, redirectToLogin, validateServerValidation } from "~/utils.server";
 import { ClientActionType, RequestPreSignedPUT, RequestUploadDone, ServerAction, ServerActionType } from "./types";
@@ -14,7 +14,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
         return redirectToLogin(request);
 
     if (auth.premission < Premission.VerifiedUser)
-        return null;
+        return redirect("/resources");
 
     const formData = await request.formData();
     const action = Number(formData.get("type") || 0) as ClientActionType;
@@ -22,11 +22,13 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     switch (action) {
         case ClientActionType.RequestUpload:
-            return json(handleRequestUpload(payload, auth));
-        case ClientActionType.RequestPreSignedPUT:
-            return json(handlePreSigned(payload));
-        case ClientActionType.RequestUploadDone:
-            return json(handleUploadSuccess(payload));
+            return json(await handleRequestUpload(payload, auth));
+        case ClientActionType.RequestPreSignedPUT: {
+            return json(await handlePreSigned(payload));
+        }
+        case ClientActionType.RequestUploadDone: {
+            return json(await handleUploadSuccess(payload));
+        }
     }
 }
 
@@ -48,14 +50,14 @@ async function handleRequestUpload(payload: object, user: AuthedInfo): Promise<S
     
     const file = await db
         .select({
-            filename: resources.filename,
+            storageFilename: resources.storageFilename,
         })
         .from(resources)
         .where(eq(resources.id, sql.placeholder('id')))
         .prepare()
-        .execute({ id: response[0] });
+        .execute({ id: response[0].id });
     
-    const storageFilename = file[0].filename;
+    const storageFilename = file[0].storageFilename;
     const s3Multipart = await createResourceMultipartUpload(storageFilename);
 
     const signature = createServerValidation(s3Multipart.UploadId + "&" + storageFilename);
