@@ -88,7 +88,7 @@ export default function ResourceNewIndex() {
                     <button
                         className="btn btn-error"
                         onClick={() => changePage(step - 1)}
-                        disabled={step <= 1}>
+                        disabled={step <= 1 || step >= 4}>
                         <MdArrowLeft className="text-2xl" /> 上一步
                     </button>
                 </div>
