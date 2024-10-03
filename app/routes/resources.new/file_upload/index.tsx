@@ -85,10 +85,6 @@ export default function FileUploadIndex({ data, setIsAbleToNext }: DataUploadEle
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetcher.data]);
 
-    useEffect(() => {
-        
-    }), [fetcher.data, state];
-
     return <div className="grid place-content-center w-full h-full">
         <div className="text-center mt-5">
             <h1 className="text-2xl">請稍待片刻，我們正在上傳檔案</h1>

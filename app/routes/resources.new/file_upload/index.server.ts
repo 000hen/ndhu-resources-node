@@ -4,7 +4,7 @@ import { AuthedInfo, createServerValidation, getAuthInfoWithPremission, redirect
 import { ClientActionType, RequestPreSignedPUT, RequestUploadDone, ServerAction, ServerActionType } from "./types";
 import { UploadResourceInterface } from "~/types/resource";
 import db from "~/db/client.server";
-import { resources } from "~/db/schema";
+import { courses, resources } from "~/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { completeResourceMultipartUpload, createResourceMultipartUpload, uploadResourcePartWithSignedUrl } from "~/storage/aws.server";
 
@@ -34,6 +34,17 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
 async function handleRequestUpload(payload: object, user: AuthedInfo): Promise<ServerAction> {
     const data = payload as UploadResourceInterface;
+
+    if (data.course && data.course.id < 0) {
+        data.course.id = (await db
+            .insert(courses)
+            .values({
+                name: data.course.name,
+                teacher: data.course.teacher,
+                display_id: data.course.display_id
+            })
+            .$returningId())[0].id;
+    }
 
     const response = await db
         .insert(resources)

@@ -6,6 +6,7 @@ import { DataUploadElementProps } from "~/types/upload";
 import type { action, loader } from "./index.server";
 import { ActionType, reducer } from "./reducer";
 import { Course } from "~/types/resource";
+import AddCourse from "./add_course";
 
 export default function CreateDataIndex({ data: uploadData, setData: setUploadData, setIsAbleToNext }: DataUploadElementProps) {
     const courseSearchRef = useRef<HTMLInputElement>(null);
@@ -18,6 +19,7 @@ export default function CreateDataIndex({ data: uploadData, setData: setUploadDa
         filename: "",
     });
     const [showCourseSearch, setShowCourseSearch] = useState(false);
+    const [showCourseCustom, setShowCourseCustom] = useState(false);
     const data = useLoaderData<typeof loader>();
     const fetcher = useFetcher<typeof action>();
 
@@ -119,8 +121,8 @@ export default function CreateDataIndex({ data: uploadData, setData: setUploadDa
                             onBlur={() => setCourseSearchValue(state.course?.name || "")}
                             onInput={(e) => suggest(e.currentTarget.value)} />
 
-                        {showCourseSearch && fetcher.data && <div className="md:w-96 w-full py-2">
-                            <div className="bg-neutral w-full rounded-xl p-2 shadow-lg">
+                        <div className="md:w-96 w-full py-2">
+                            {showCourseSearch && fetcher.data && <div className="bg-neutral w-full rounded-xl p-2 shadow-lg">
                                 {fetcher.data.length > 0 && fetcher.data.map((v) =>
                                     <CourseSearchCard
                                         key={"resource:new:course:" + v.id}
@@ -135,16 +137,25 @@ export default function CreateDataIndex({ data: uploadData, setData: setUploadDa
                                             teacher: v.teacher,
                                         })} />
                                 )}
-                                {(courseSearchRef.current?.value.length || 0) >= 2 && <div
-                                    className="p-2 px-5 hover:bg-gray-700 cursor-pointer rounded-lg transition-all">
+                                {(courseSearchRef.current?.value.length || 0) >= 2 && <button
+                                    className="p-2 px-5 w-full text-left hover:bg-gray-700 cursor-pointer rounded-lg transition-all"
+                                    onClick={() => {
+                                        setShowCourseCustom(true);
+                                        setShowCourseSearch(false);
+                                    }}>
                                     找不到符合的課程嗎？點擊這裡新增！
-                                </div>}
+                                </button>}
                                 {(courseSearchRef.current?.value.length || 0) < 2 && <div
-                                    className="p-2 px-5 hover:bg-gray-700 cursor-pointer rounded-lg transition-all">
+                                    className="p-2 px-5 rounded-lg">
                                     請輸入至少兩個字元以搜尋
                                 </div>}
-                            </div>
-                        </div>}
+                            </div>}
+
+                            {showCourseCustom && <AddCourse
+                                course={{ id: -1, name: "", display_id: "", teacher: "" }}
+                                setCourse={setCourse}
+                                close={() => setShowCourseCustom(false)} />}
+                        </div>
                     </div>
                 </div>
             </div>

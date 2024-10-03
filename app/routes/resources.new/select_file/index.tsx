@@ -17,8 +17,6 @@ export default function SelectFileIndex({ data: uploadData, setData: setUploadDa
         });
     }
 
-    console.log(uploadData);
-
     function reselect() {
         if (!uploadData)
             return;
