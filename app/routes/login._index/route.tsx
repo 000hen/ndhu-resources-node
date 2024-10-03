@@ -63,7 +63,7 @@ export const action: ActionFunction = async ({ request }) => {
             });
     }
 
-    if (data.name !== user[0].display && user.length) {
+    if (user[0] && data.name !== user[0].display && user.length) {
         await db
             .update(premissions)
             .set({
