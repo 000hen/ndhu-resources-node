@@ -105,7 +105,7 @@ export default function ResourcesIndex() {
                     <JoinedButton tips="以創建順序排序" isHighlighted={sort === SortBy.Time} onClick={() => changeSort(SortBy.Time)}>
                         <MdAccessTimeFilled />
                     </JoinedButton>
-                    <JoinedButton tips="以創建 A-Z 排序" isHighlighted={sort === SortBy.AZ} onClick={() => changeSort(SortBy.AZ)}>
+                    <JoinedButton tips="以 A-Z 排序" isHighlighted={sort === SortBy.AZ} onClick={() => changeSort(SortBy.AZ)}>
                         <MdSortByAlpha />
                     </JoinedButton>
                     <JoinedButton tips="以下載次數排序" isHighlighted={sort === SortBy.Downloads} onClick={() => changeSort(SortBy.Downloads)}>

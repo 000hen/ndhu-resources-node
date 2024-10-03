@@ -12,6 +12,7 @@ import { premissions } from "~/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { checkIsNDHU, Premission } from "~/utils";
 import { loader as rootLoader } from "~/root";
+import { DecodedIdToken } from "~/types/firebase";
 
 export const meta: MetaFunction = () => {
     return [
@@ -28,7 +29,7 @@ export const action: ActionFunction = async ({ request }) => {
     const idToken = form.get("idToken")?.toString();
 
     invariant(idToken, "Missing token");
-    const data = await serverAuth.verifyIdToken(idToken);
+    const data = await serverAuth.verifyIdToken(idToken) as unknown as DecodedIdToken;
     const jwt = await serverAuth.createSessionCookie(idToken, { expiresIn: 60480000 });
 
     const user = await db
@@ -57,7 +58,8 @@ export const action: ActionFunction = async ({ request }) => {
                 id: data.sub,
                 premission: (data.email_verified && checkIsNDHU(data.email || ""))
                     ? Premission.VerifiedUser
-                    : Premission.User
+                    : Premission.User,
+                display: data.name
             });
     }
 
