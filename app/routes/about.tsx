@@ -1,6 +1,7 @@
 import { MetaFunction } from "@remix-run/node";
-import LogoComponent from "~/components/logo";
+import LogoComponent from "~/components/logos/logo";
 import { version } from "~/../package.json";
+import UmiraLogo from "~/components/logos/umira.svg?react";
 
 export const meta: MetaFunction = () => {
     return [
@@ -11,6 +12,9 @@ export const meta: MetaFunction = () => {
 
 export default function AboutIndex() {
     return <div>
+        <div className="h-48 w-full p-10">
+            <UmiraLogo className="text-center h-full w-full" />
+        </div>
         <div className="h-48 card bg-neutral grid place-content-center p-5">
             <div>
                 <LogoComponent />

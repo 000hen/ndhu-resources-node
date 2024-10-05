@@ -12,7 +12,7 @@ export const meta: MetaFunction = () => {
 export default function AdminIndex() {
     const parentData = useRouteLoaderData<typeof rootLoader>("root");
 
-    return <div className="w-full grid place-content-center md:mt-20">
+    return <div className="w-full grid place-content-center">
         <h1>✨ 很榮幸見到您！一起來維護東華資源庫吧！</h1>
         <div className="alert alert-info mb-2">
             <p className="mb-0">

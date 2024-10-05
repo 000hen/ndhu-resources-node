@@ -1,0 +1,1 @@
+ALTER TABLE `resourceReport` MODIFY COLUMN `category` enum('inappropriate','nsfw','suicide','bullying','harmful','hatred','copyright','sexal','incorrect');

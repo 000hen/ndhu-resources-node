@@ -50,7 +50,8 @@ export const premissionRelations = relations(premissions, ({ many }) => ({
     resources: many(resources),
     pushOrDump: many(pushOrDump),
     comments: many(comments),
-    downloaded: many(resourceDownloaded)
+    downloaded: many(resourceDownloaded),
+    reports: many(resourceReport)
 }));
 
 export const tagTypes = customType<{ data: string[], driverData: string }>({
@@ -102,6 +103,7 @@ export const resourceRelations = relations(resources, ({ one, many }) => ({
     pushOrDump: many(pushOrDump),
     comments: many(resources),
     downloaded: many(resourceDownloaded),
+    reports: many(resourceReport)
 }));
 
 export const pushOrDump = mysqlTable("pushOrDump", {
@@ -211,4 +213,33 @@ export const resourceCategory = mysqlTable("resourceCategory", {
 
 export const resourceCategoryRelations = relations(resourceCategory, ({ many }) => ({
     resources: many(resources)
+}));
+
+export const resourceReport = mysqlTable("resourceReport", {
+    id: varchar("id", { length: 36 })
+        .primaryKey()
+        .$defaultFn(() => v4())
+        .notNull(),
+    reporter: varchar("reporter", { length: 36 })
+        .notNull()
+        .references(() => premissions.user_id, { onDelete: "cascade" }),
+    resource: int("resource")
+        .notNull()
+        .references(() => resources.id, { onDelete: "cascade" }),
+    category: mysqlEnum("category", ["inappropriate", "nsfw", "suicide", "bullying", "harmful", "hatred", "copyright", "sexal", "incorrect"]),
+    reason: text("reason")
+        .notNull(),
+    create_at: timestamp("create_at")
+        .notNull()
+        .default(sql`CURRENT_TIMESTAMP`)
+}, resourceReport => ({
+    reporter_idx: index("resource_report_reporter_idx").on(resourceReport.reporter),
+    resource_idx: index("resource_report_resource_idx").on(resourceReport.resource),
+    reporter_resource_idx: index("resource_report_reporter_resource_idx").on(resourceReport.reporter, resourceReport.resource),
+    create_at_idx: index("resource_report_create_at_idx").on(resourceReport.create_at)
+}));
+
+export const resourceReportRelations = relations(resourceReport, ({ one }) => ({
+    reporter: one(premissions, { fields: [resourceReport.reporter], references: [premissions.user_id] }),
+    resource: one(resources, { fields: [resourceReport.resource], references: [resources.id] })
 }));

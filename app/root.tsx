@@ -23,7 +23,7 @@ import {
 } from "react-icons/md";
 import PanelLink from "./components/panel_link";
 import { IconType } from "react-icons";
-import LogoComponent from "./components/logo";
+import LogoComponent from "./components/logos/logo";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { AuthInfo, getAuthInfoWithPremission } from "./utils.server";
 import { FaUser } from "react-icons/fa";
