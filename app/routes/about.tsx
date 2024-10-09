@@ -2,6 +2,7 @@ import { MetaFunction } from "@remix-run/node";
 import LogoComponent from "~/components/logos/logo";
 import { version } from "~/../package.json";
 import UmiraLogo from "~/components/logos/umira.svg?react";
+import NDHUResLogo from "~/components/logos/logo_icon.svg?react";
 
 export const meta: MetaFunction = () => {
     return [
@@ -15,10 +16,17 @@ export default function AboutIndex() {
         <div className="h-48 w-full p-10">
             <UmiraLogo className="text-center h-full w-full" />
         </div>
-        <div className="h-48 card bg-neutral grid place-content-center p-5">
-            <div>
-                <LogoComponent />
-                <span className="block text-xl mb-0 mt-2">ver. {version}</span>
+        <div className="card bg-neutral grid place-content-center">
+            <div className="flex flex-row p-5">
+                <div className="md:h-48 h-24">
+                    <NDHUResLogo className="h-full w-full" />
+                </div>
+                <div className="flex-auto grid place-content-center">
+                    <div>
+                        <LogoComponent />
+                        <span className="block text-xl mb-0 mt-2">ver. {version}</span>
+                    </div>
+                </div>
             </div>
         </div>
 

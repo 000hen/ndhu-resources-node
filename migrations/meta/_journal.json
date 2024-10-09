@@ -85,6 +85,20 @@
       "when": 1728141139750,
       "tag": "0011_wise_domino",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1728477283188,
+      "tag": "0012_square_star_brand",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1728479546593,
+      "tag": "0013_condemned_gauntlet",
+      "breakpoints": true
     }
   ]
 }

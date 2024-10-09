@@ -1,5 +1,6 @@
 import { CompleteMultipartUploadCommand, CreateMultipartUploadCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client, UploadPartCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { fileTypeFromBuffer } from "file-type";
 
 if (!process.env.S3_ENDPOINT) {
     throw new Error("S3_ENDPOINT is required");
@@ -59,6 +60,19 @@ export async function putResourceWithSignedUrl(file: string) {
         Bucket: bucket,
         Key: file,
     }), { expiresIn: EXPIRED_IN });
+}
+
+export async function getResourceMimeType(file: string) {
+    const data = await S3.send(new GetObjectCommand({
+        Bucket: bucket,
+        Key: file,
+        Range: "bytes=0-1024"
+    }));
+
+    if (!data.Body) {
+        throw new Error("Failed to get object body from S3");
+    }
+    return await fileTypeFromBuffer(await data.Body.transformToByteArray());
 }
 
 // Multipart Upload

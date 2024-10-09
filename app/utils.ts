@@ -88,3 +88,11 @@ export const numberFormat = (num: number) => {
 
     return format.join("");
 }
+
+export const isMimeSafe = (mime: string) => {
+    return mime.includes("image")
+        || mime.includes("pdf")
+        || mime.includes("video")
+        || mime.includes("audio")
+        || mime.includes("text");
+}

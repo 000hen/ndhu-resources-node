@@ -111,58 +111,72 @@ export default function App() {
         setShowMenu((e) => !e);
     }
 
-    return <div className="relative max-h-screen overflow-y-auto flex lg:flex-row flex-col bg-base-100 overflow-x-hidden">
-            <div className="sticky top-0 lg:h-full z-50 shadow-md lg:shadow-none">
-                <div className="backdrop-blur-md bg-neutral/80">
-                    <div className="lg:hidden p-5 flex justify-between items-center">
-                        <button className="p-3 rounded-xl" onClick={toggleMenu}>
-                            {!showMenu && <MdMenu size={32} />}
-                            {showMenu && <MdClose size={32} />}
-                        </button>
-                        <h1 className="text-2xl px-5 block mb-0 lg:hidden"><LogoComponent /></h1>
-                        <div className="p-2 grid place-content-center">
-                            {profileImg}
-                        </div>
+    return <div className="relative max-h-screen overflow-y-auto min-h-screen flex lg:flex-row flex-col bg-base-100 overflow-x-hidden">
+        <div className="sticky top-0 lg:h-full z-50 shadow-md lg:shadow-none">
+            <div className="backdrop-blur-md bg-neutral/80">
+                <div className="lg:hidden p-5 flex justify-between items-center">
+                    <button className="p-3 rounded-xl" onClick={toggleMenu}>
+                        {!showMenu && <MdMenu size={32} />}
+                        {showMenu && <MdClose size={32} />}
+                    </button>
+                    <h1 className="text-2xl px-5 block mb-0 lg:hidden"><LogoComponent /></h1>
+                    <div className="p-2 grid place-content-center">
+                        {profileImg}
                     </div>
-                    <div className={"lg:block p-5 lg:p-0".concat(" " + (showMenu ? "block" : "hidden"))}>
-                        <div className="w-full lg:min-w-96 lg:w-max lg:min-h-screen lg:block rounded-lg lg:rounded-none">
-                            <div className="flex flex-col w-full justify-between items-center lg:min-h-screen lg:p-10 px-10">
-                                <div className="w-full px-5 hidden lg:block">
-                                    {profileImg}
+                </div>
+                <div className={"lg:block p-5 lg:p-0".concat(" " + (showMenu ? "block" : "hidden"))}>
+                    <div className="w-full lg:min-w-96 lg:w-max lg:min-h-screen lg:block rounded-lg lg:rounded-none">
+                        <div className="flex flex-col w-full justify-between items-center lg:min-h-screen lg:p-10 px-10">
+                            <div className="w-full px-5 hidden lg:block">
+                                {profileImg}
+                            </div>
+                            <div className="w-full">
+                                <h1 className="text-2xl mb-5 px-5 hidden lg:block"><LogoComponent /></h1>
+                                <div className="flex flex-col lg:mt-5">
+                                    <Link onClick={toggleMenu} to={"/search"} className="btn btn-base-100 w-full justify-start items-center mb-3">
+                                        <MdSearch size={16} className="text-base-content" />
+                                        資料搜尋
+                                    </Link>
+                                    {Object.values(pages(data)).map(e => <PanelLink
+                                        key={`panel:link:${e.path}`}
+                                        onClick={toggleMenu}
+                                        className={e.className}
+                                        highlight={matches}
+                                        icon={e.icon}
+                                        to={e.path}>{e.display}</PanelLink>)}
                                 </div>
-                                <div className="w-full">
-                                    <h1 className="text-2xl mb-5 px-5 hidden lg:block"><LogoComponent /></h1>
-                                    <div className="flex flex-col lg:mt-5">
-                                        <Link onClick={toggleMenu} to={"/search"} className="btn btn-base-100 w-full justify-start items-center mb-3">
-                                            <MdSearch size={16} className="text-base-content" />
-                                            資料搜尋
-                                        </Link>
-                                        {Object.values(pages(data)).map(e => <PanelLink
-                                            key={`panel:link:${e.path}`}
+                            </div>
+                            <div>
+                                <div className="flex">
+                                    {data.auth && <FooterButtonComponent
+                                        to="/logout"
+                                        tip="登出"
+                                        onClick={toggleMenu}
+                                        className="btn-error">
+                                        <MdLogout size={25} />
+                                    </FooterButtonComponent>}
+                                    {premissions >= Premission.Editor
+                                        && <FooterButtonComponent
+                                            to="/admin"
+                                            tip="管理介面"
                                             onClick={toggleMenu}
-                                            className={e.className}
-                                            highlight={matches}
-                                            icon={e.icon}
-                                            to={e.path}>{e.display}</PanelLink>)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="flex">
-                                        {data.auth && <FooterButtonComponent to="/logout" tip="登出" className="btn-error">
-                                            <MdLogout size={25} />
+                                            className="btn-info">
+                                            <MdAdminPanelSettings size={25} />
                                         </FooterButtonComponent>}
-                                        {premissions >= Premission.Editor
-                                            && <FooterButtonComponent to="/admin" tip="管理介面" className="btn-info">
-                                                <MdAdminPanelSettings size={25} />
-                                            </FooterButtonComponent>}
-                                    </div>
-                                    <p className="mt-2 text-center mb-0">© 2024 Umira Projects <Link to={"/about"} className="tooltip" data-tip="關於這個平台"><MdInfo className="inline" /></Link></p>
                                 </div>
+                                <p className="mt-2 text-center mb-0">© 2024 Umira Projects <Link
+                                    to={"/about"}
+                                    className="tooltip"
+                                    onClick={toggleMenu}
+                                    data-tip="關於這個平台">
+                                    <MdInfo className="inline" />
+                                </Link></p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         <div className="p-5 lg:p-10 w-full max-h-max lg:min-h-max">
             {page[matches] && <h1 className="text-4xl mb-5 font-bold">{page[matches].display}</h1>}
             <div className="alert alert-warning mb-2">

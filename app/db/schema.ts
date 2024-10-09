@@ -51,7 +51,8 @@ export const premissionRelations = relations(premissions, ({ many }) => ({
     pushOrDump: many(pushOrDump),
     comments: many(comments),
     downloaded: many(resourceDownloaded),
-    reports: many(resourceReport)
+    reports: many(resourceReport),
+    reviews: many(resourceReviewer)
 }));
 
 export const tagTypes = customType<{ data: string[], driverData: string }>({
@@ -59,6 +60,7 @@ export const tagTypes = customType<{ data: string[], driverData: string }>({
     toDriver: (value: string[]) => value.join(", "),
     fromDriver: (value: string) => value.split(", ")
 });
+const stateEnums = ["uploading", "pending", "approved", "rejected", "DMCA takedown"] as const;
 
 export const resources = mysqlTable("resources", {
     id: int("id")
@@ -86,7 +88,7 @@ export const resources = mysqlTable("resources", {
     create_at: timestamp("create_at")
         .notNull()
         .default(sql`CURRENT_TIMESTAMP`),
-    state: mysqlEnum("state", ["uploading", "pending", "approved", "rejected", "DMCA takedown"])
+    state: mysqlEnum("state", stateEnums)
         .notNull()
         .default("uploading"),
 }, resources => ({
@@ -103,7 +105,8 @@ export const resourceRelations = relations(resources, ({ one, many }) => ({
     pushOrDump: many(pushOrDump),
     comments: many(resources),
     downloaded: many(resourceDownloaded),
-    reports: many(resourceReport)
+    reports: many(resourceReport),
+    reviews: many(resourceReviewer)
 }));
 
 export const pushOrDump = mysqlTable("pushOrDump", {
@@ -226,9 +229,8 @@ export const resourceReport = mysqlTable("resourceReport", {
     resource: int("resource")
         .notNull()
         .references(() => resources.id, { onDelete: "cascade" }),
-    category: mysqlEnum("category", ["inappropriate", "nsfw", "suicide", "bullying", "harmful", "hatred", "copyright", "sexal", "incorrect"]),
-    reason: text("reason")
-        .notNull(),
+    category: mysqlEnum("category", ["inappropriate", "nsfw", "suicide", "bullying", "harmful", "hatred", "copyright", "incorrect"]),
+    reason: text("reason"),
     create_at: timestamp("create_at")
         .notNull()
         .default(sql`CURRENT_TIMESTAMP`)
@@ -242,4 +244,33 @@ export const resourceReport = mysqlTable("resourceReport", {
 export const resourceReportRelations = relations(resourceReport, ({ one }) => ({
     reporter: one(premissions, { fields: [resourceReport.reporter], references: [premissions.user_id] }),
     resource: one(resources, { fields: [resourceReport.resource], references: [resources.id] })
+}));
+
+export const resourceReviewer = mysqlTable("resourcesReviewer", {
+    id: varchar("id", { length: 36 })
+        .primaryKey()
+        .$defaultFn(() => v4())
+        .notNull(),
+    reviewer: varchar("reviewer", { length: 36 })
+        .references(() => premissions.user_id, { onDelete: "cascade" }),
+    resource: int("resource")
+        .notNull()
+        .references(() => resources.id, { onDelete: "cascade" }),
+    reason: text("reason"),
+    state: mysqlEnum("state", stateEnums)
+        .notNull()
+        .default("pending"),
+    create_at: timestamp("create_at")
+        .notNull()
+        .default(sql`CURRENT_TIMESTAMP`)
+}, resourceReviewer => ({
+    reviewer_idx: index("resource_reviewer_reviewer_idx").on(resourceReviewer.reviewer),
+    resource_idx: index("resource_reviewer_resource_idx").on(resourceReviewer.resource),
+    reviewer_resource_idx: index("resource_reviewer_reviewer_resource_idx").on(resourceReviewer.reviewer, resourceReviewer.resource),
+    create_at_idx: index("resource_reviewer_create_at_idx").on(resourceReviewer.create_at)
+}));
+
+export const resourceReviewerRelations = relations(resourceReviewer, ({ one }) => ({
+    reviewer: one(premissions, { fields: [resourceReviewer.reviewer], references: [premissions.user_id] }),
+    resource: one(resources, { fields: [resourceReviewer.resource], references: [resources.id] })
 }));

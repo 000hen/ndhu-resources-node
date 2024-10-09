@@ -4,9 +4,10 @@ import { AuthedInfo, createServerValidation, getAuthInfoWithPremission, redirect
 import { ClientActionType, RequestPreSignedPUT, RequestUploadDone, ServerAction, ServerActionType } from "./types";
 import { UploadResourceInterface } from "~/types/resource";
 import db from "~/db/client.server";
-import { courses, resources } from "~/db/schema";
+import { courses, resourceReviewer, resources } from "~/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { completeResourceMultipartUpload, createResourceMultipartUpload, uploadResourcePartWithSignedUrl } from "~/storage/aws.server";
+import { ProcessType, queue } from "~/queue/queue.server";
 
 export async function action({ request, context }: ActionFunctionArgs) {
     const auth = await getAuthInfoWithPremission({ request, context });
@@ -105,14 +106,29 @@ async function handleUploadSuccess(payload: object): Promise<ServerAction | null
         return null;
 
     await completeResourceMultipartUpload(data.fileid, data.uploadid, data.parts);
-    await db
-        .update(resources)
-        .set({
-            state: "pending"
-        })
-        .where(eq(resources.id, sql.placeholder('id')))
-        .prepare()
-        .execute({ id: data.resourceid });
+    await Promise.all([
+        db
+            .update(resources)
+            .set({
+                state: "pending"
+            })
+            .where(eq(resources.id, sql.placeholder('id')))
+            .prepare()
+            .execute({ id: data.resourceid }),
+        db
+            .insert(resourceReviewer)
+            .values({
+                resource: data.resourceid,
+                reason: "state.uploaded",
+            })
+    ]);
+
+    await queue.add({
+        type: ProcessType.AutoReview,
+        payload: {
+            id: data.resourceid
+        }
+    });
 
     return {
         type: ServerActionType.ServerUploadDone

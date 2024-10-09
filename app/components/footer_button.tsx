@@ -5,7 +5,8 @@ import { classFormat } from "~/utils";
 interface FooterButtonArgs extends PropsWithChildren {
     tip?: string,
     to: string,
-    className?: string
+    className?: string,
+    onClick?: () => void
 }
 
 export default function FooterButtonComponent(configs: FooterButtonArgs) {
@@ -16,6 +17,7 @@ export default function FooterButtonComponent(configs: FooterButtonArgs) {
                 configs.tip && "tooltip",
                 configs.className
             ])}
+            onClick={configs.onClick}
             data-tip={configs.tip || ""}
             to={configs.to}>
             {configs.children}

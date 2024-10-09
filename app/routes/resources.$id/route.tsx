@@ -3,9 +3,9 @@ import db from "~/db/client.server";
 import invariant from "tiny-invariant";
 import { ResourceInterface } from "~/types/resource";
 import { and, eq, sql } from "drizzle-orm";
-import { useFetcher, useLoaderData, useNavigate, useRouteLoaderData } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData, useMatches, useNavigate, useOutlet, useRouteLoaderData } from "@remix-run/react";
 import { getResourceSignedUrl, getResourceSize } from "~/storage/aws.server";
-import { MdArrowDownward, MdArrowUpward, MdCategory, MdClass, MdDownload, MdFlag, MdInsertDriveFile } from "react-icons/md";
+import { MdArrowDownward, MdArrowUpward, MdCategory, MdClass, MdClose, MdDownload, MdFlag, MdInsertDriveFile } from "react-icons/md";
 import { downloadURI, humanFileSize, numberFormat, Premission } from "~/utils";
 import { HashTagsFormat } from "~/components/resource_card";
 import { FaUser } from "react-icons/fa";
@@ -205,8 +205,10 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 export default function ResourcePage() {
     const data = useLoaderData<typeof loader>();
+    const matches = useMatches();
     const parentData = useRouteLoaderData<typeof rootLoader>("root");
     const navigate = useNavigate();
+    const outlet = useOutlet();
     const fetcher = useFetcher<typeof action>();
 
     useEffect(() => {
@@ -235,7 +237,7 @@ export default function ResourcePage() {
     return <div className="max-w-full">
         <div className="flex flex-col-reverse md:flex-row">
             <div className="flex flex-row md:flex-col min-h-full mt-2 md:mr-2 md:mt-0">
-                <button className="card btn btn-neutral h-full md:h-fit mr-2 md:mr-0 md:mb-2 p-5 tooltip" data-tip="檢舉資源濫用"><MdFlag size={32} /></button>
+                <Link to={"report"} className="card btn btn-neutral h-full md:h-fit mr-2 md:mr-0 md:mb-2 p-5 tooltip" data-tip="檢舉資源濫用"><MdFlag size={32} /></Link>
                 <div className="card shadow-xl bg-neutral min-w-fit flex-auto">
                     <div className="py-2 md:py-5 px-5 md:px-2 h-full">
                         <div className="flex md:flex-col h-full justify-between w-full items-center">
@@ -304,5 +306,18 @@ export default function ResourcePage() {
         <p>
             {data.description}
         </p>
+
+        {outlet && <div className="absolute top-0 right-0 w-full h-full z-50 bg-neutral/60 backdrop-blur-sm flex justify-center items-center">
+            <div className="card p-5 bg-neutral m-10 w-full lg:w-[1000px] shadow-xl">
+                <div className="flex justify-end w-full">
+                    <div className="tooltip" data-tip="關閉">
+                        <Link to={matches.at(-2)?.pathname || "#"} className="btn btn-circle btn-ghost"><MdClose size={32} /></Link>
+                    </div>
+                </div>
+                <div className="max-h-[80vh] overflow-auto p-2">
+                    {outlet}
+                </div>
+            </div>
+        </div>}
     </div>;
 }
