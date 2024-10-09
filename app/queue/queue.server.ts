@@ -24,19 +24,27 @@ export const queue = new Queue<ProcessData>("default", {
     },
 });
 
-queue.process(async (job) => {
-    switch (job.data.type) {
-        case ProcessType.AutoReview:
-            return autoReviewerHandler(job);
-        case ProcessType.NotifyAdminReview:
-            return;
-        case ProcessType.NoyifyAdminReport:
-            return;
-        case ProcessType.UnuploadDataRemoval:
-            return;
-    }
-});
+export type JobFunction = (job: Queue.Job<ProcessData>, done: () => void) => void;
+type JobsInterface = {
+    [key in ProcessType]: JobFunction;
+};
 
+// TODO: Add the rest of the jobs
+const JOBS: JobsInterface = {
+    [ProcessType.AutoReview]: autoReviewerHandler,
+    [ProcessType.NotifyAdminReview]: (job, done) => {
+        done();
+    },
+    [ProcessType.NoyifyAdminReport]: (job, done) => {
+        done();
+    },
+    [ProcessType.UnuploadDataRemoval]: (job, done) => {
+        done();
+    },
+}
+
+// Process the queue
+queue.process(async (job, done) => JOBS[job.data.type](job, done));
 queue.on("error", (error) => {
     console.error(error);
 });

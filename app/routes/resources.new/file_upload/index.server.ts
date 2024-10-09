@@ -24,12 +24,10 @@ export async function action({ request, context }: ActionFunctionArgs) {
     switch (action) {
         case ClientActionType.RequestUpload:
             return json(await handleRequestUpload(payload, auth));
-        case ClientActionType.RequestPreSignedPUT: {
+        case ClientActionType.RequestPreSignedPUT:
             return json(await handlePreSigned(payload));
-        }
-        case ClientActionType.RequestUploadDone: {
+        case ClientActionType.RequestUploadDone:
             return json(await handleUploadSuccess(payload));
-        }
     }
 }
 

@@ -6,7 +6,7 @@ import { eq, sql } from "drizzle-orm";
 import { getResourceMimeType } from "~/storage/aws.server";
 import { isMimeSafe } from "~/utils";
 
-export default async function handler(job: Queue.Job<ProcessData>) {
+export default async function handler(job: Queue.Job<ProcessData>, done: () => void) {
     if (job.data.type !== ProcessType.AutoReview)
         return;
 
@@ -76,4 +76,5 @@ export default async function handler(job: Queue.Job<ProcessData>) {
     }
 
     console.log(`[Autoreviewer] Resource ${job.data.payload.id} processed`);
+    done();
 }
