@@ -28,8 +28,17 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
         .findFirst({
             with: {
                 resources: {
+                    columns: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        tags: true,
+                        state: true,
+                        create_at: true,
+                    },
                     with: {
-                        course: true
+                        course: true,
+                        category: true,
                     }
                 },
                 comments: true,
