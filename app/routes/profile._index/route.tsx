@@ -65,48 +65,48 @@ export default function ProfileIndex() {
 
     return <div>
         <CardComponent title="🥳 很高興見到您！">
-            <div className="flex m-5 justify-center">
-                <div className="px-5 grid place-content-center">
+            <div className="flex flex-col sm:flex-row m-3 md:m-5 justify-center">
+                <div className="sm:px-5 grid sm:place-content-center mb-8 sm:mb-0">
                     <img referrerPolicy="no-referrer" alt="Profile" title={`登入為 ${data.display}`} className="min-w-16 md:w-32 rounded-full" src={profileImage} />
                 </div>
-                <div className="flex-auto ml-5">
+                <div className="flex-auto sm:ml-5">
                     <div className="flex flex-col lg:flex-row justify-center items-start lg:items-center lg:justify-between h-full">
                         <div>
-                            <h1 className="flex flex-col lg:flex-row lg:items-center mb-0 text-4xl lg:text-6xl">
+                            <h1 className="flex flex-col lg:flex-row lg:items-center mb-0 text-4xl md:text-6xl">
                                 {data.display}
-                                
-                                <div>
-                                    {premissions <= Premission.Disabled && <IconBadgeComponent
-                                        icon={MdNoAccounts}
-                                        className="text-error">
-                                        您的帳戶已被停用，您可能違反了我們的服務條款
-                                    </IconBadgeComponent>}
-
-                                    {checkIsNDHU(data.email || "@") && premissions >= Premission.VerifiedUser
-                                        && <IconBadgeComponent
-                                        icon={MdVerified}
-                                        className="text-success">
-                                        您使用東華大學之 Google 帳戶且已驗證 Email
-                                        </IconBadgeComponent>}
-
-                                    {premissions >= Premission.Editor && <IconBadgeComponent
-                                        icon={MdEdit}
-                                        className="text-info">
-                                        您具有版主權限
-                                    </IconBadgeComponent>}
-
-                                    {premissions >= Premission.Admin && <IconBadgeComponent
-                                        icon={MdLocalPolice}
-                                        className="text-error">
-                                        您是東華資源庫的管理員
-                                    </IconBadgeComponent>}
-                                </div>
                             </h1>
+                                
+                            <div className="text-4xl mt-2">
+                                {premissions <= Premission.Disabled && <IconBadgeComponent
+                                    icon={MdNoAccounts}
+                                    className="text-error">
+                                    您的帳戶已被停用，您可能違反了我們的服務條款
+                                </IconBadgeComponent>}
+
+                                {checkIsNDHU(data.email || "@") && premissions >= Premission.VerifiedUser
+                                    && <IconBadgeComponent
+                                    icon={MdVerified}
+                                    className="text-success">
+                                    您使用東華大學之 Google 帳戶且已驗證 Email
+                                    </IconBadgeComponent>}
+
+                                {premissions >= Premission.Editor && <IconBadgeComponent
+                                    icon={MdEdit}
+                                    className="text-info">
+                                    您具有版主權限
+                                </IconBadgeComponent>}
+
+                                {premissions >= Premission.Admin && <IconBadgeComponent
+                                    icon={MdLocalPolice}
+                                    className="text-error">
+                                    您是東華資源庫的管理員
+                                </IconBadgeComponent>}
+                            </div>
                             <span className="block mt-2 italic text-gray-500">{data.email}</span>
                         </div>
-                        <div>
-                            <div className="tooltip" data-tip="登出">
-                                <Link to={"/logout"} className="btn btn-error mt-2 lg:mt-0"><MdLogout size={24} /></Link>
+                        <div className="w-full md:w-fit mt-10 md:mt-0">
+                            <div className="tooltip w-full" data-tip="登出">
+                                <Link to={"/logout"} className="btn btn-error mt-2 lg:mt-0 w-full"><MdLogout size={24} /></Link>
                             </div>
                         </div>
                     </div>

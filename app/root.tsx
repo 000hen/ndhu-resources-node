@@ -117,7 +117,7 @@ export default function App() {
         <div className="sticky top-0 lg:h-full z-50 shadow-md lg:shadow-none">
             <div className="backdrop-blur-md bg-neutral/80">
                 <div className="lg:hidden p-5 flex justify-between items-center">
-                    <button className="p-3 rounded-xl" onClick={openMenu}>
+                    <button className="p-3 rounded-xl" onClick={showMenu ? closeMenu : openMenu}>
                         {!showMenu && <MdMenu size={32} />}
                         {showMenu && <MdClose size={32} />}
                     </button>
