@@ -105,16 +105,19 @@ export default function App() {
     const profileImg = data.auth ? ProfileImage(data.profile || "", data.display) : <FaUser size={40} />;
     const premissions = data.auth ? data.premission : 0;
 
-    function toggleMenu() {
-        setShowMenu((e) => !e);
-        setOverflowHidden(!showMenu);
+    function toggleMenu(action?: boolean) {
+        setShowMenu(action ?? !showMenu);
+        setOverflowHidden(action ?? !showMenu);
     }
+
+    const openMenu = () => toggleMenu(true);
+    const closeMenu = () => toggleMenu(false);
 
     return <div className="relative max-h-screen overflow-y-auto min-h-screen flex lg:flex-row flex-col bg-base-100 overflow-x-hidden" id="content">
         <div className="sticky top-0 lg:h-full z-50 shadow-md lg:shadow-none">
             <div className="backdrop-blur-md bg-neutral/80">
                 <div className="lg:hidden p-5 flex justify-between items-center">
-                    <button className="p-3 rounded-xl" onClick={toggleMenu}>
+                    <button className="p-3 rounded-xl" onClick={openMenu}>
                         {!showMenu && <MdMenu size={32} />}
                         {showMenu && <MdClose size={32} />}
                     </button>
@@ -134,13 +137,13 @@ export default function App() {
                             <div className="w-full">
                                 <h1 className="text-2xl mb-5 px-5 hidden lg:block"><LogoComponent /></h1>
                                 <div className="flex flex-col lg:mt-5">
-                                    <Link onClick={toggleMenu} to={"/search"} className="btn btn-base-100 w-full justify-start items-center mb-3">
+                                    <Link onClick={closeMenu} to={"/search"} className="btn btn-base-100 w-full justify-start items-center mb-3">
                                         <MdSearch size={16} className="text-base-content" />
                                         資料搜尋
                                     </Link>
                                     {Object.values(pages(data)).filter(e => !!e).map(e => <PanelLink
                                         key={`panel:link:${e.path}`}
-                                        onClick={toggleMenu}
+                                        onClick={closeMenu}
                                         className={e.className}
                                         highlight={matches}
                                         icon={e.icon}
@@ -152,7 +155,7 @@ export default function App() {
                                     {data.auth && <FooterButtonComponent
                                         to="/logout"
                                         tip="登出"
-                                        onClick={toggleMenu}
+                                        onClick={closeMenu}
                                         className="btn-error">
                                         <MdLogout size={25} />
                                     </FooterButtonComponent>}
@@ -160,7 +163,7 @@ export default function App() {
                                         && <FooterButtonComponent
                                             to="/admin"
                                             tip="管理介面"
-                                            onClick={toggleMenu}
+                                            onClick={closeMenu}
                                             className="btn-info">
                                             <MdAdminPanelSettings size={25} />
                                         </FooterButtonComponent>}
@@ -168,7 +171,7 @@ export default function App() {
                                 <p className="mt-2 text-center mb-0">© 2024 Umira Projects <Link
                                     to={"/about"}
                                     className="tooltip"
-                                    onClick={toggleMenu}
+                                    onClick={closeMenu}
                                     data-tip="關於這個平台">
                                     <MdInfo className="inline" />
                                 </Link></p>
