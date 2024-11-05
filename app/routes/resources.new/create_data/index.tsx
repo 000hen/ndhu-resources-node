@@ -85,13 +85,13 @@ export default function CreateDataIndex({ data: uploadData, setData: setUploadDa
 
                 <div className="mt-10">
                     <h2>資源標籤</h2>
-                    <p>請輸入資源的標籤，以空格分隔。</p>
+                    <p>請輸入資源的標籤，以逗號分隔。</p>
                     <input
                         type="text"
                         className="input input-bordered input-lg bg-neutral grow w-full md:w-96"
-                        placeholder="超級資源 極度機密 急！在線等！"
-                        onInput={(e) => dispatch({ type: ActionType.SET_TAGS, payload: e.currentTarget.value.trim().split(" ") })}
-                        defaultValue={state.tags?.join(" ")} />
+                        placeholder="超級資源, 極度機密, 急！在線等！"
+                        onInput={(e) => dispatch({ type: ActionType.SET_TAGS, payload: e.currentTarget.value.trim().split(",").map(e => e.trim()) })}
+                        defaultValue={state.tags?.join(", ")} />
                 </div>
             </div>
 

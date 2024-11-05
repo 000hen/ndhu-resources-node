@@ -14,6 +14,7 @@ import {
     MdClass,
     MdClose,
     MdDescription,
+    MdFavorite,
     MdGroups,
     MdInfo,
     MdLogin,
@@ -31,6 +32,7 @@ import { googleImageResize, Premission } from "./utils";
 import FooterButtonComponent from "./components/footer_button";
 
 import "./tailwind.css";
+import { useOverflowHidden } from "./overflowhidden";
 
 interface PanelNaviagePage {
     display: string,
@@ -40,7 +42,7 @@ interface PanelNaviagePage {
 }
 
 interface Pages {
-    [path: string]: PanelNaviagePage
+    [path: string]: PanelNaviagePage | undefined
 }
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
@@ -50,25 +52,20 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 }
 
 function pages(auth: AuthInfo): Pages {
-    let user: PanelNaviagePage = {
-        display: "登入",
-        path: "login",
-        icon: MdLogin
-    };
-
-    if (auth.auth) {
-        user = {
-            display: "個人頁面",
-            path: "profile",
-            icon: googleImageResize(auth.profile || "", 20)
-        };
-    }
-
     return {
         resources: { display: "資源大廳", path: "resources", icon: MdDescription },
         courses: { display: "課堂列表", path: "courses", icon: MdClass },
         teachers: { display: "老師列表", path: "teachers", icon: MdGroups },
-        user
+        favorite: auth.auth
+            ? { display: "收藏的資源", path: "favorite", icon: MdFavorite }
+            : undefined,
+        user: auth.auth
+            ? {
+                display: "個人頁面",
+                path: "profile",
+                icon: googleImageResize(auth.profile || "", 20)
+            }
+            : { display: "登入", path: "login", icon: MdLogin }
     }
 }
 
@@ -101,6 +98,7 @@ function ProfileImage(url: string, username: string) {
 export default function App() {
     const matches = useMatches()[1].pathname.split("/")[1];
     const data = useLoaderData<typeof loader>();
+    const setOverflowHidden = useOverflowHidden(false);
 
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const page = pages(data);
@@ -109,9 +107,10 @@ export default function App() {
 
     function toggleMenu() {
         setShowMenu((e) => !e);
+        setOverflowHidden(!showMenu);
     }
 
-    return <div className="relative max-h-screen overflow-y-auto min-h-screen flex lg:flex-row flex-col bg-base-100 overflow-x-hidden">
+    return <div className="relative max-h-screen overflow-y-auto min-h-screen flex lg:flex-row flex-col bg-base-100 overflow-x-hidden" id="content">
         <div className="sticky top-0 lg:h-full z-50 shadow-md lg:shadow-none">
             <div className="backdrop-blur-md bg-neutral/80">
                 <div className="lg:hidden p-5 flex justify-between items-center">
@@ -121,7 +120,9 @@ export default function App() {
                     </button>
                     <h1 className="text-2xl px-5 block mb-0 lg:hidden"><LogoComponent /></h1>
                     <div className="p-2 grid place-content-center">
-                        {profileImg}
+                        <div className="hidden sm:block w-0 sm:w-auto">
+                            {profileImg}
+                        </div>
                     </div>
                 </div>
                 <div className={"lg:block p-5 lg:p-0".concat(" " + (showMenu ? "block" : "hidden"))}>
@@ -137,7 +138,7 @@ export default function App() {
                                         <MdSearch size={16} className="text-base-content" />
                                         資料搜尋
                                     </Link>
-                                    {Object.values(pages(data)).map(e => <PanelLink
+                                    {Object.values(pages(data)).filter(e => !!e).map(e => <PanelLink
                                         key={`panel:link:${e.path}`}
                                         onClick={toggleMenu}
                                         className={e.className}
@@ -177,7 +178,7 @@ export default function App() {
                 </div>
             </div>
         </div>
-        <div className="p-5 lg:p-10 w-full max-h-max lg:min-h-max">
+        <div className="p-5 lg:p-10 w-full lg:min-h-max">
             {page[matches] && <h1 className="text-4xl mb-5 font-bold">{page[matches].display}</h1>}
             <div className="alert alert-warning mb-2">
                 <svg

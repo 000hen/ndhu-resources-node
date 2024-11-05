@@ -1,63 +1,21 @@
 import { count, desc, eq, SQL, sql, sum } from "drizzle-orm";
 import db from "~/db/client.server";
 import {
-  courses,
-  pushOrDump,
-  resourceCategory,
-  resourceDownloaded,
-  resources,
+    courses,
+    pushOrDump,
+    resourceCategory,
+    resourceDownloaded,
+    resources,
+    userFavorites,
 } from "~/db/schema";
 import { SortBy } from "./resources_interface";
-import { SubqueryWithSelection, MySqlColumn } from "drizzle-orm/mysql-core";
+import { SubqueryWithSelection } from "drizzle-orm/mysql-core";
 import { ResourceInterface } from "~/types/resource";
 
 type SortByPopularity =
-    | SubqueryWithSelection<
+    SubqueryWithSelection<
         {
-            resource: MySqlColumn<
-                {
-                    name: "resource";
-                    tableName: "pushOrDump";
-                    dataType: "number";
-                    columnType: "MySqlInt";
-                    data: number;
-                    driverParam: string | number;
-                    notNull: true;
-                    hasDefault: false;
-                    isPrimaryKey: false;
-                    isAutoincrement: false;
-                    hasRuntimeDefault: false;
-                    enumValues: undefined;
-                    baseColumn: never;
-                    generated: undefined;
-                },
-                object
-            >;
-            popularity: SQL.Aliased<string | null>;
-        },
-        "mostPopular"
-        >
-    | SubqueryWithSelection<
-        {
-            resource: MySqlColumn<
-                {
-                    name: "resource";
-                    tableName: "resourceDownloaded";
-                    dataType: "number";
-                    columnType: "MySqlInt";
-                    data: number;
-                    driverParam: string | number;
-                    notNull: true;
-                    hasDefault: false;
-                    isPrimaryKey: false;
-                    isAutoincrement: false;
-                    hasRuntimeDefault: false;
-                    enumValues: undefined;
-                    baseColumn: never;
-                    generated: undefined;
-                },
-                object
-            >;
+            resource: typeof pushOrDump.resource;
             popularity: SQL.Aliased<number>;
         },
         "mostPopular"
@@ -105,7 +63,7 @@ export async function sortByVotes(offset: number): Promise<ResourceInterface[]> 
     const mostPopular = db
         .select({
             resource: pushOrDump.resource,
-            popularity: sum(pushOrDump.isPush).as("popularity"),
+            popularity: sum(pushOrDump.isPush).mapWith(Number).as("popularity"),
         })
         .from(pushOrDump)
         .groupBy(pushOrDump.resource)
@@ -125,6 +83,22 @@ export async function sortByDownloads(offset: number): Promise<ResourceInterface
         })
         .from(resourceDownloaded)
         .groupBy(resourceDownloaded.resource)
+        .orderBy(desc(sql`popularity`))
+        .limit(20)
+        .offset(offset)
+        .as("mostPopular");
+
+    return await sortByPopularity(mostPopular);
+}
+
+export async function sortByFavorite(offset: number): Promise<ResourceInterface[]> {
+    const mostPopular = db
+        .select({
+            resource: pushOrDump.resource,
+            popularity: count().as("popularity"),
+        })
+        .from(userFavorites)
+        .groupBy(userFavorites.resource)
         .orderBy(desc(sql`popularity`))
         .limit(20)
         .offset(offset)

@@ -99,6 +99,13 @@
       "when": 1728479546593,
       "tag": "0013_condemned_gauntlet",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1730809749041,
+      "tag": "0014_smooth_imperial_guard",
+      "breakpoints": true
     }
   ]
 }

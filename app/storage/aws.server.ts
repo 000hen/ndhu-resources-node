@@ -1,6 +1,7 @@
 import { CompleteMultipartUploadCommand, CreateMultipartUploadCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client, UploadPartCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { fileTypeFromBuffer } from "file-type";
+import redis from "~/storage/redis.server";
 
 if (!process.env.S3_ENDPOINT) {
     throw new Error("S3_ENDPOINT is required");
@@ -19,6 +20,7 @@ if (!process.env.S3_BUCKET) {
 }
 
 const EXPIRED_IN = 3600;
+const REDIS_EXPIRED_IN = 604800;
 
 const bucket = process.env.S3_BUCKET;
 const S3 = new S3Client({
@@ -43,8 +45,16 @@ export async function getResourceCheckSum(file: string) {
 }
 
 export async function getResourceSize(file: string) {
-    const metadata = await getResourceMetadata(file);
-    return Number(metadata.ContentLength || 0);
+    const size = await redis.get(`s3:${file}:size`);
+
+    if (!size) {
+        const metadata = await getResourceMetadata(file);
+        await redis.set(`s3:${file}:size`, metadata.ContentLength || 0, { EX: REDIS_EXPIRED_IN });
+        
+        return Number(metadata.ContentLength || 0);
+    }
+
+    return Number(size);
 }
 
 export async function getResourceSignedUrl(file: string, filename: string) {

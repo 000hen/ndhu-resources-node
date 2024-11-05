@@ -1,6 +1,5 @@
 import { Course, UploadResourceInterface } from "~/types/resource";
 
-// TODO: Add reducer logic for the create_data page
 export enum ActionType {
     SET_NAME,
     SET_DESCRIPTION,

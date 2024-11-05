@@ -37,6 +37,7 @@ export default function AdminRoute() {
     return <div>
         <h1>管理介面</h1>
         <div role="tablist" className="tabs tabs-boxed">
+            {/* TODO: Add functionallity to the links */}
             <AdminNavigateLink to="sorts" currentPath={matches}><MdSort /> 課程分類管理</AdminNavigateLink>
             <AdminNavigateLink to="courses" currentPath={matches}><MdClass /> 課程管理</AdminNavigateLink>
             <AdminNavigateLink to="resources" currentPath={matches}><MdDescription /> 資源管理</AdminNavigateLink>

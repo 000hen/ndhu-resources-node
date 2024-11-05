@@ -5,20 +5,22 @@ import { ResourceInterface } from "~/types/resource";
 import { and, eq, sql } from "drizzle-orm";
 import { Link, useFetcher, useLoaderData, useMatches, useNavigate, useOutlet, useRouteLoaderData } from "@remix-run/react";
 import { getResourceSignedUrl, getResourceSize } from "~/storage/aws.server";
-import { MdArrowDownward, MdArrowUpward, MdCategory, MdClass, MdClose, MdDownload, MdFlag, MdInsertDriveFile } from "react-icons/md";
-import { downloadURI, humanFileSize, numberFormat, Premission } from "~/utils";
+import { MdCategory, MdClass, MdClose, MdDownload, MdFlag, MdInsertDriveFile } from "react-icons/md";
+import { downloadURI, humanFileSize, Premission } from "~/utils";
 import { HashTagsFormat } from "~/components/resource_card";
 import { FaUser } from "react-icons/fa";
 import { loader as rootLoader } from "~/root";
 import { getAuthInfoWithPremission } from "~/utils.server";
 import { useEffect } from "react";
-import { pushOrDump, resourceDownloaded } from "~/db/schema";
-import VoteButton from "./vote_button";
+import { pushOrDump, resourceDownloaded, userFavorites } from "~/db/schema";
+import VoteComponent from "./vote_button";
+import FavoriteButtonComponent from "./favorite_button";
 
 interface ResourceDownloadInterface extends ResourceInterface {
     size: number;
     filename: string;
     user_vote: number | null;
+    isFavorite: boolean;
 }
 
 export async function loader({ params, context, request }: LoaderFunctionArgs): Promise<TypedResponse<ResourceDownloadInterface>> {
@@ -47,26 +49,46 @@ export async function loader({ params, context, request }: LoaderFunctionArgs): 
             id: Number(id),
         });
     
-    const userVoteQuery = db
-        .query
-        .pushOrDump
-        .findFirst({
-            columns: {
-                isPush: true,
-                author: true,
-            },
-            where: (v) => and(eq(v.resource, sql.placeholder("resource")),
-                eq(v.author, sql.placeholder("author"))),
-        })
-        .prepare()
-        .execute({
-            resource: Number(id),
-            author: (auth.auth && auth.id) || "",
-        });
+    const userVoteQuery = auth.auth
+        ? db
+            .query
+            .pushOrDump
+            .findFirst({
+                columns: {
+                    isPush: true,
+                    author: true,
+                },
+                where: (v) => and(eq(v.resource, sql.placeholder("resource")),
+                    eq(v.author, sql.placeholder("author"))),
+            })
+            .prepare()
+            .execute({
+                resource: Number(id),
+                author: auth.id,
+            })
+        : Promise.resolve(null);
     
-    const [resource, userVote] = await Promise.all([
+    const userFavoriteQuery = auth.auth
+        ? db
+            .query
+            .userFavorites
+            .findFirst({
+                columns: {
+                    resource: true,
+                },
+                where: (v) => and(eq(v.resource, sql.placeholder("resource")), eq(v.user, sql.placeholder("author"))),
+            })
+            .prepare()
+            .execute({
+                resource: Number(id),
+                author: auth.id,
+            })
+        : Promise.resolve(null);
+    
+    const [resource, userVote, userFavorite] = await Promise.all([
         resourceQuery,
         userVoteQuery,
+        userFavoriteQuery,
     ]);
     
     if (!resource)
@@ -95,7 +117,13 @@ export async function loader({ params, context, request }: LoaderFunctionArgs): 
         // Storage Data
         size: attributes[0],
         user_vote: userVote?.isPush || null,
+        isFavorite: !!userFavorite,
     });
+}
+
+enum ActionType {
+    Download,
+    Favorite
 }
 
 export async function action({ request, context, params }: ActionFunctionArgs) {
@@ -106,12 +134,66 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
     const { id } = params;
     invariant(id, "resource id is required");
 
-    if (request.method == "PUT")
-        return actionUserPush(Number(id), auth.id);
+    if (["PUT", "DELETE"].includes(request.method))
+        return actionUserVote(Number(id), auth.id, request.method === "PUT" ? 1 : -1);
 
-    if (request.method == "DELETE")
-        return actionUserDump(Number(id), auth.id);
+    const form = await request.formData();
+    const action = form.get("action");
+    invariant(action, "action is required");
+    const actionType = Number(action) as ActionType;
 
+    if (actionType === ActionType.Download)
+        return actionDownloadResource(Number(id), auth.id);
+
+    if (actionType === ActionType.Favorite)
+        return actionFavoriteResource(Number(id), auth.id);
+}
+
+async function actionFavoriteResource(id: number, user: string) {
+    const isFavorite = await db
+        .query
+        .userFavorites
+        .findFirst({
+            columns: {
+                resource: true,
+            },
+            where: (v) => and(eq(v.resource, sql.placeholder("resource")), eq(v.user, sql.placeholder("author"))),
+        })
+        .prepare()
+        .execute({
+            resource: id,
+            author: user,
+        });
+    
+    if (isFavorite) {
+        await db
+            .delete(userFavorites)
+            .where(and(eq(userFavorites.resource, sql.placeholder("resource")), eq(userFavorites.user, sql.placeholder("author"))))
+            .prepare()
+            .execute({
+                resource: id,
+                author: user,
+            });
+        
+        return null;
+    }
+
+    await db
+        .insert(userFavorites)
+        .values({
+            resource: sql.placeholder("resource"),
+            user: sql.placeholder("author"),
+        })
+        .prepare()
+        .execute({
+            resource: id,
+            author: user,
+        });
+    
+    return null;
+}
+
+async function actionDownloadResource(id: number, user: string) {
     const resource = await db
         .query
         .resources
@@ -125,9 +207,9 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
         })
         .prepare()
         .execute({
-            id: Number(id),
+            id: id,
         });
-    
+
     if (!resource || resource.state !== "approved")
         return null;
 
@@ -140,7 +222,7 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
         .prepare()
         .execute({
             resource: Number(id),
-            author: auth.id,
+            author: user,
         });
 
     return json({ storage: await getResourceSignedUrl(resource.storageFilename, resource.filename) });
@@ -161,7 +243,7 @@ async function actionUserVote(resource: number, user: string, type: number) {
             resource,
             author: user
         });
-    
+
     if (isUserVoted) {
         await db
             .delete(pushOrDump)
@@ -188,14 +270,6 @@ async function actionUserVote(resource: number, user: string, type: number) {
     return null;
 }
 
-async function actionUserPush(resource: number, user: string) {
-    return actionUserVote(resource, user, 1);
-}
-
-async function actionUserDump(resource: number, user: string) {
-    return actionUserVote(resource, user, -1);
-}
-
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
     return [
         { title: `${data?.name} - 東華資源庫` },
@@ -219,8 +293,8 @@ export default function ResourcePage() {
         }
     }, [fetcher.data, fetcher.state]);
 
-    function downloadFile() {
-        fetcher.submit({}, {
+    function doAction(action: ActionType) {
+        fetcher.submit({ action }, {
             method: "post"
         });
     }
@@ -237,36 +311,25 @@ export default function ResourcePage() {
     return <div className="max-w-full">
         <div className="flex flex-col-reverse md:flex-row">
             <div className="flex flex-row md:flex-col min-h-full mt-2 md:mr-2 md:mt-0">
-                <Link to={"report"} className="card btn btn-neutral h-full md:h-fit mr-2 md:mr-0 md:mb-2 p-5 tooltip" data-tip="檢舉資源濫用"><MdFlag size={32} /></Link>
-                <div className="card shadow-xl bg-neutral min-w-fit flex-auto">
-                    <div className="py-2 md:py-5 px-5 md:px-2 h-full">
-                        <div className="flex md:flex-col h-full justify-between w-full items-center">
-                            <VoteButton
-                                icon={MdArrowUpward}
-                                onClick={() => vote(1)}
-                                isVoted={data?.user_vote === 1}
-                                votedMessage={"您已推薦過此資源"}
-                                unvotedMessage={parentData?.auth ? "推薦此資源" : "登入以對此資源評價"} />
-                            
-                            <div className="grid place-content-center">
-                                {numberFormat(data.votes.up - data.votes.down)}
-                            </div>
-
-                            <VoteButton
-                                icon={MdArrowDownward}
-                                onClick={() => vote(-1)}
-                                isVoted={data?.user_vote === -1}
-                                votedMessage={"您已踩過此資源"}
-                                unvotedMessage={parentData?.auth ? "踩此資源" : "登入以對此資源評價"} />
-                        </div>
-                    </div>
-                </div>
+                <Link to={"report"} className="card btn btn-neutral shadow-xl h-full md:h-fit mr-2 md:mr-0 md:mb-2 p-5 tooltip" data-tip="檢舉資源濫用"><MdFlag size={32} /></Link>
+                <VoteComponent
+                    voteup={data.votes.up}
+                    votedown={data.votes.down}
+                    userVote={data.user_vote || 0}
+                    vote={vote}
+                    isAuth={!!parentData?.auth} />
             </div>
             <div className="card shadow-xl bg-neutral flex-auto">
                 <div className="p-5 2xl:p-10">
                     <div className="">
                         <div>
-                            <h1 className="text-4xl 2xl:text-6xl break-all max-w-full">{data.name}</h1>
+                            <FavoriteButtonComponent
+                                isFavorite={data.isFavorite}
+                                onClick={() => doAction(ActionType.Favorite)} />
+
+                            <h1 className="text-4xl 2xl:text-6xl break-all">
+                                {data.name}
+                            </h1>
                             <HashTagsFormat tags={data.tags || undefined} />
                             <div className="mt-5 grid gap-2">
                                 {data.course && <>
@@ -292,7 +355,7 @@ export default function ResourcePage() {
                                     </button>}
                                 {parentData?.auth && <>
                                         {(parentData.premission || 0) >= Premission.VerifiedUser
-                                        ? <button onClick={downloadFile} className="btn btn-primary lg:min-w-60 w-full xl:w-40"><MdDownload size={16} />下載</button>
+                                        ? <button onClick={() => doAction(ActionType.Download)} className="btn btn-primary lg:min-w-60 w-full xl:w-40"><MdDownload size={16} />下載</button>
                                         : <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">抱歉！您的權限不足，無法下載！</button>}
                                 </>}
                             </>}
@@ -308,13 +371,13 @@ export default function ResourcePage() {
         </p>
 
         {outlet && <div className="absolute top-0 right-0 w-full h-full z-50 bg-neutral/60 backdrop-blur-sm flex justify-center items-center">
-            <div className="card p-5 bg-neutral m-10 w-full lg:w-[1000px] shadow-xl">
+            <div className="card p-5 bg-neutral h-full md:h-fit md:m-10 w-full md:w-[600px] shadow-xl">
                 <div className="flex justify-end w-full">
-                    <div className="tooltip" data-tip="關閉">
+                    <div className="tooltip tooltip-left md:tooltip-top" data-tip="關閉">
                         <Link to={matches.at(-2)?.pathname || "#"} className="btn btn-circle btn-ghost"><MdClose size={32} /></Link>
                     </div>
                 </div>
-                <div className="max-h-[80vh] overflow-auto p-2">
+                <div className="md:max-h-[80vh] overflow-auto p-2">
                     {outlet}
                 </div>
             </div>

@@ -88,7 +88,7 @@ export default function ResourcesIndex() {
                 isGridView={gridView}
                 setGridView={setGridView}
                 left={<>
-                    <div className="tooltip mr-2" data-tip="搜尋資源">
+                    <div className="tooltip mr-2 hidden sm:inline-block" data-tip="搜尋資源">
                         <Link to={"/search"} className="btn btn-outline">
                             <MdSearch />
                         </Link>

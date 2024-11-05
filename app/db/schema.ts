@@ -52,7 +52,34 @@ export const premissionRelations = relations(premissions, ({ many }) => ({
     comments: many(comments),
     downloaded: many(resourceDownloaded),
     reports: many(resourceReport),
-    reviews: many(resourceReviewer)
+    reviews: many(resourceReviewer),
+    favorites: many(userFavorites)
+}));
+
+export const userFavorites = mysqlTable("userFavorites", {
+    id: varchar("id", { length: 36 })
+        .primaryKey()
+        .$defaultFn(() => v4())
+        .notNull(),
+    user: varchar("user", { length: 36 })
+        .notNull()
+        .references(() => premissions.user_id, { onDelete: "cascade" }),
+    resource: int("resource")
+        .notNull()
+        .references(() => resources.id, { onDelete: "cascade" }),
+    create_at: timestamp("create_at")
+        .notNull()
+        .default(sql`CURRENT_TIMESTAMP`)
+}, userFavorites => ({
+    user_idx: index("user_favorites_user_idx").on(userFavorites.user),
+    resource_idx: index("user_favorites_resource_idx").on(userFavorites.resource),
+    user_resource_idx: index("user_favorites_user_resource_idx").on(userFavorites.user, userFavorites.resource),
+    create_at_idx: index("user_favorites_create_at_idx").on(userFavorites.create_at)
+}));
+
+export const userFavoritesRelations = relations(userFavorites, ({ one }) => ({
+    user: one(premissions, { fields: [userFavorites.user], references: [premissions.user_id] }),
+    resource: one(resources, { fields: [userFavorites.resource], references: [resources.id] })
 }));
 
 export const tagTypes = customType<{ data: string[], driverData: string }>({
