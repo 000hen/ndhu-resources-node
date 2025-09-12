@@ -1,4 +1,5 @@
 import {
+    isRouteErrorResponse,
     Link,
     Links,
     Meta,
@@ -7,15 +8,14 @@ import {
     ScrollRestoration,
     useLoaderData,
     useMatches,
+    useRouteError,
 } from "@remix-run/react";
 import { useState } from "react";
 import {
     MdAdminPanelSettings,
-    MdClass,
     MdClose,
     MdDescription,
     MdFavorite,
-    MdGroups,
     MdInfo,
     MdLogin,
     MdLogout,
@@ -30,9 +30,11 @@ import { AuthInfo, getAuthInfoWithPremission } from "./utils.server";
 import { FaUser } from "react-icons/fa";
 import { googleImageResize, Premission } from "./utils";
 import FooterButtonComponent from "./components/footer_button";
+import { useOverflowHidden } from "./overflowhidden";
+import { AlphaMessage } from "./components/alpha_message.client";
+import { IntroMessage } from "./components/intro.client";
 
 import "./tailwind.css";
-import { useOverflowHidden } from "./overflowhidden";
 
 interface PanelNaviagePage {
     display: string,
@@ -54,8 +56,6 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 function pages(auth: AuthInfo): Pages {
     return {
         resources: { display: "資源大廳", path: "resources", icon: MdDescription },
-        courses: { display: "課堂列表", path: "courses", icon: MdClass },
-        teachers: { display: "老師列表", path: "teachers", icon: MdGroups },
         favorite: auth.auth
             ? { display: "收藏的資源", path: "favorite", icon: MdFavorite }
             : undefined,
@@ -79,6 +79,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Links />
             </head>
             <body>
+                {typeof window !== "undefined" && <IntroMessage />}
                 {children}
                 <ScrollRestoration />
                 <Scripts />
@@ -182,22 +183,23 @@ export default function App() {
             </div>
         </div>
         <div className="p-5 lg:p-10 w-full lg:min-h-max">
-            {page[matches] && <h1 className="text-4xl mb-5 font-bold">{page[matches].display}</h1>}
-            <div className="alert alert-warning mb-2">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 shrink-0 stroke-current"
-                    fill="none"
-                    viewBox="0 0 24 24">
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span>本網站為正處於早期測試階段，功能可能暫時不完整或出現嚴重錯誤，敬請您的諒解。</span>
-            </div>
+            {page[matches] && <h1 className="text-4xl font-bold">{page[matches].display}</h1>}
+            {typeof window !== "undefined" && <AlphaMessage />}
             <Outlet />
+        </div>
+    </div>;
+}
+
+export function ErrorBoundary() {
+    const error = useRouteError();
+
+    return <div className="p-10 min-h-screen flex items-center">
+        <div className="container m-auto">
+            <h1 className="text-4xl font-bold">發生錯誤</h1>
+            <p>抱歉，網站發生錯誤，請稍後再試。</p>
+            <pre className="whitespace-pre-wrap break-words">Message: {isRouteErrorResponse(error) && error.statusText}</pre>
+            <p>若持續發生錯誤，請聯絡我們。</p>
+            <Link to={"/"} className="btn btn-primary mt-5">回到首頁</Link>
         </div>
     </div>;
 }

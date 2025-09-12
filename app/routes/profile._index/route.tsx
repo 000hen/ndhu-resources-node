@@ -8,6 +8,8 @@ import NumberCardFormatComponent from "~/components/number_card_format";
 import db from "~/db/client.server";
 import { checkIsNDHU, googleImageResize, Premission } from "~/utils";
 import { getAuthInfoWithPremission, redirectToLogin } from "~/utils.server";
+import { PropsWithChildren } from "react";
+import { IconType } from "react-icons";
 
 export const meta: MetaFunction = () => {
     return [
@@ -55,6 +57,22 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
         ...auth,
         ...user
     })
+}
+
+interface StatusCardComponentArgs extends PropsWithChildren {
+    title: string,
+    amount: number,
+    to?: string,
+    icon?: IconType
+}
+
+function StatusCardComponent(configs: StatusCardComponentArgs) {
+    const Icon = configs.icon ?? MdStorage;
+
+    return <CardComponent title={configs.title}>
+        <NumberCardFormatComponent bold amount={configs.amount} format="項" />
+        {configs.to && <Link to={configs.to} className="btn btn-outline mt-2"><Icon /> {configs.children}</Link>}
+    </CardComponent>
 }
 
 export default function ProfileIndex() {
@@ -121,26 +139,34 @@ export default function ProfileIndex() {
         </CardComponent>
 
         <div className="md:grid grid-cols-2">
-            <CardComponent title="您貢獻的資源數">
-                <NumberCardFormatComponent bold amount={data.resources?.length || 0} format="項" />
-                <Link to="resources" className="btn btn-outline mt-2"><MdStorage /> 查看您創建的資源</Link>
-            </CardComponent>
-            <CardComponent title="已審核成功的資源">
-                <NumberCardFormatComponent bold amount={data.resources?.filter(e => e.state === "approved").length || 0} format="項" />
-                <Link to="resources?action=accept" className="btn btn-outline mt-2"><MdStorage /> 查看已審核成功的資源</Link>
-            </CardComponent>
-            <CardComponent title="您推過的資源">
-                <NumberCardFormatComponent bold amount={data.pushOrDump?.filter(e => e.isPush > 0).length || 0} format="項" />
-                <Link to="resources?action=push" className="btn btn-outline m-2"><MdThumbUp /> 查看您推薦過的資源</Link>
-            </CardComponent>
-            <CardComponent title="您踩過的資源">
-                <NumberCardFormatComponent bold amount={data.pushOrDump?.filter(e => e.isPush < 0).length || 0} format="項" />
-                <Link to="resources?action=dump" className="btn btn-outline m-2"><MdThumbDown /> 查看您不推薦的資源</Link>
-            </CardComponent>
-            <CardComponent title="您做出的評論">
-                <NumberCardFormatComponent bold amount={data.comments?.length || 0} format="項" />
-                <Link to="resources?action=comment" className="btn btn-outline m-2"><MdStorage /> 查看您留言過的資源</Link>
-            </CardComponent>
+            <StatusCardComponent
+                title="您創建的資源數"
+                amount={data.resources?.length || 0} />
+            <StatusCardComponent
+                title="已審核成功的資源"
+                amount={data.resources?.filter(e => e.state === "approved").length || 0} />
+            
+            <StatusCardComponent
+                title="您推過的資源"
+                to="resources?action=push"
+                icon={MdThumbUp}
+                amount={data.pushOrDump?.filter(e => e.isPush > 0).length || 0}>
+                查看您推薦過的資源
+            </StatusCardComponent>
+            <StatusCardComponent
+                title="您踩過的資源"
+                to="resources?action=dump"
+                icon={MdThumbDown}
+                amount={data.pushOrDump?.filter(e => e.isPush < 0).length || 0}>
+                查看您不推薦的資源
+            </StatusCardComponent>
+
+            <StatusCardComponent
+                title="您做出的評論"
+                to="resources?action=comment"
+                amount={data.comments?.length || 0}>
+                查看您留言過的資源
+            </StatusCardComponent>
         </div>
     </div>;
 }

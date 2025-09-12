@@ -2,7 +2,7 @@
   "name": "ndhu-resources-node",
   "private": true,
   "sideEffects": false,
-  "version": "0.0.2-preview",
+  "version": "0.0.3-preview",
   "type": "module",
   "scripts": {
     "build": "remix vite:build",

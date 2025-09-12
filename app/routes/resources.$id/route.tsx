@@ -5,7 +5,7 @@ import { ResourceInterface } from "~/types/resource";
 import { and, eq, sql } from "drizzle-orm";
 import { Link, useFetcher, useLoaderData, useMatches, useNavigate, useOutlet, useRouteLoaderData } from "@remix-run/react";
 import { getResourceSignedUrl, getResourceSize } from "~/storage/aws.server";
-import { MdCategory, MdClass, MdClose, MdDownload, MdFlag, MdInsertDriveFile } from "react-icons/md";
+import { MdCategory, MdClass, MdDownload, MdFlag, MdInsertDriveFile } from "react-icons/md";
 import { downloadURI, humanFileSize, Premission } from "~/utils";
 import { HashTagsFormat } from "~/components/resource_card";
 import { FaUser } from "react-icons/fa";
@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { pushOrDump, resourceDownloaded, userFavorites } from "~/db/schema";
 import VoteComponent from "./vote_button";
 import FavoriteButtonComponent from "./favorite_button";
+import { AlertBox } from "~/components/alert_box";
 
 interface ResourceDownloadInterface extends ResourceInterface {
     size: number;
@@ -370,17 +371,8 @@ export default function ResourcePage() {
             {data.description}
         </p>
 
-        {outlet && <div className="absolute top-0 right-0 w-full h-full z-50 bg-neutral/60 backdrop-blur-sm flex justify-center items-center">
-            <div className="card p-5 bg-neutral h-full md:h-fit md:m-10 w-full md:w-[600px] shadow-xl">
-                <div className="flex justify-end w-full">
-                    <div className="tooltip tooltip-left md:tooltip-top" data-tip="關閉">
-                        <Link to={matches.at(-2)?.pathname || "#"} className="btn btn-circle btn-ghost"><MdClose size={32} /></Link>
-                    </div>
-                </div>
-                <div className="md:max-h-[80vh] overflow-auto p-2">
-                    {outlet}
-                </div>
-            </div>
-        </div>}
+        {outlet && <AlertBox onClose={() => navigate(matches.at(-2)?.pathname || "#")}>
+            {outlet}
+        </AlertBox>}
     </div>;
 }
