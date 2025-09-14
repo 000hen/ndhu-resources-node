@@ -67,7 +67,20 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
     return json({
         size: favoritesLength[0].count,
-        favorites: favorites,
+        favorites: favorites.map((e) => ({
+            id: e.resource.id,
+            name: e.resource.name,
+            description: e.resource.description,
+            tags: e.resource.tags,
+            create_at: e.resource.create_at,
+            state: e.resource.state,
+            course: e.resource.course,
+            votes: {
+                up: e.resource.pushOrDump.filter((v) => v.isPush > 0).length,
+                down: e.resource.pushOrDump.filter((v) => v.isPush < 0).length,
+            },
+            category: e.resource.category,
+        })),
     });
 }
 
@@ -98,18 +111,21 @@ export default function FavoritePage() {
                     return (
                         <ResourceCardComponent
                             key={"resource:fav:card:" + favorite.id}
-                            id={favorite.resource.id}
-                            tags={favorite.resource.tags || undefined}
-                            teacher={favorite.resource.course?.teacher || "N/A"}
-                            subject={favorite.resource.course?.name || "N/A"}
-                            title={favorite.resource.name}
-                            category={favorite.resource.category?.name}
+                            id={favorite.id}
+                            tags={favorite.tags || undefined}
+                            votes={{
+                                upvotes: favorite.votes.up,
+                                downvotes: favorite.votes.down,
+                            }}
+                            teacher={favorite.course?.teacher || "N/A"}
+                            subject={favorite.course?.name || "N/A"}
+                            title={favorite.name}
+                            category={favorite.category?.name}
                         >
-                            {favorite.resource.description &&
-                            favorite.resource.description.length > 250
-                                ? favorite.resource.description.slice(0, 250) +
-                                  "..."
-                                : favorite.resource.description}
+                            {favorite.description &&
+                            favorite.description.length > 250
+                                ? favorite.description.slice(0, 250) + "..."
+                                : favorite.description}
                         </ResourceCardComponent>
                     );
                 })}
