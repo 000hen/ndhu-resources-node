@@ -5,7 +5,7 @@ import { auth as clientAuth } from "~/firebase.client";
 import { auth as serverAuth } from "~/firebase.server";
 import { useFetcher, useNavigate, useRouteLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import cookie from "~/cookies.server";
+import cookie from "~/storage/cookies.server";
 import Hr from "~/components/hr";
 import db from "~/db/client.server";
 import { premissions } from "~/db/schema";

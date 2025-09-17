@@ -1,7 +1,7 @@
 import { AppLoadContext, redirect } from "@remix-run/node";
 import { DecodedIdToken } from "./types/firebase";
 import { auth as serverAuth } from "./firebase.server";
-import cookie from "./cookies.server";
+import cookie from "./storage/cookies.server";
 import db from "./db/client.server";
 import { eq, sql } from "drizzle-orm";
 import crypto from "crypto";

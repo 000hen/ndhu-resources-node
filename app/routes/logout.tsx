@@ -1,5 +1,5 @@
 import { redirect } from "@remix-run/node";
-import cookie from "~/cookies.server";
+import cookie from "~/storage/cookies.server";
 
 export async function loader() {
     return redirect("/login", {
