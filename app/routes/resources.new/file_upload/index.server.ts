@@ -71,6 +71,17 @@ async function handleRequestUpload(payload: object, user: AuthedInfo): Promise<S
     const s3Multipart = await createResourceMultipartUpload(storageFilename);
 
     const signature = createServerValidation(s3Multipart.UploadId + "&" + storageFilename);
+    await queue.add(
+        {
+            type: ProcessType.UnuploadDataRemoval,
+            payload: {
+                id: response[0].id,
+            },
+        },
+        {
+            delay: 1000 * 60 * 60 * 24,
+        }
+    );
     
     return {
         type: ServerActionType.ServerUploadResponse,

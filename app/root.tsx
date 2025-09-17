@@ -30,7 +30,7 @@ import { AuthInfo, getAuthInfoWithPremission } from "./utils.server";
 import { FaUser } from "react-icons/fa";
 import { googleImageResize, Premission } from "./utils";
 import FooterButtonComponent from "./components/footer_button";
-import { useOverflowHidden } from "./overflowhidden";
+import { useOverflowHidden } from "./hooks/overflowhidden";
 import { AlphaMessage } from "./components/alpha_message.client";
 import { IntroMessage } from "./components/intro.client";
 

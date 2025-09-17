@@ -1,5 +1,7 @@
 import Queue from "bull";
-import autoReviewerHandler from "./autoreviewer.server";
+import { NotImplementedTask, QueueTask } from "./queue_task";
+import Autoreviewer from "./autoreviewer.server";
+import AutoRemoveUnuploaded from "./auto_remove_unuploaded";
 
 export enum ProcessType {
     AutoReview,
@@ -24,27 +26,20 @@ export const queue = new Queue<ProcessData>("default", {
     },
 });
 
-export type JobFunction = (job: Queue.Job<ProcessData>, done: () => void) => void;
 type JobsInterface = {
-    [key in ProcessType]: JobFunction;
+    [key in ProcessType]: QueueTask;
 };
 
 // TODO: Add the rest of the jobs
 const JOBS: JobsInterface = {
-    [ProcessType.AutoReview]: autoReviewerHandler,
-    [ProcessType.NotifyAdminReview]: (job, done) => {
-        done();
-    },
-    [ProcessType.NoyifyAdminReport]: (job, done) => {
-        done();
-    },
-    [ProcessType.UnuploadDataRemoval]: (job, done) => {
-        done();
-    },
-}
+    [ProcessType.AutoReview]: new Autoreviewer(),
+    [ProcessType.NotifyAdminReview]: new NotImplementedTask(),
+    [ProcessType.NoyifyAdminReport]: new NotImplementedTask(),
+    [ProcessType.UnuploadDataRemoval]: new AutoRemoveUnuploaded(),
+};
 
 // Process the queue
-queue.process(async (job, done) => JOBS[job.data.type](job, done));
+queue.process(async (job, done) => JOBS[job.data.type].process(job, done));
 queue.on("error", (error) => {
     console.error(error);
 });

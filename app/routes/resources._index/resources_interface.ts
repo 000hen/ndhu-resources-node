@@ -2,5 +2,6 @@ export enum SortBy {
     AZ = "az",
     Votes = "votes",
     Time = "time",
-    Downloads = "downloads"
+    Downloads = "downloads",
+    Favorite = "favorite",
 }

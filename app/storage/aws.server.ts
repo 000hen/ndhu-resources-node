@@ -1,4 +1,13 @@
-import { CompleteMultipartUploadCommand, CreateMultipartUploadCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client, UploadPartCommand } from "@aws-sdk/client-s3";
+import {
+    CompleteMultipartUploadCommand,
+    CreateMultipartUploadCommand,
+    GetObjectCommand,
+    HeadObjectCommand,
+    PutObjectCommand,
+    S3Client,
+    S3ServiceException,
+    UploadPartCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { fileTypeFromBuffer } from "file-type";
 import redis from "~/storage/redis.server";
@@ -28,15 +37,17 @@ const S3 = new S3Client({
     endpoint: process.env.S3_ENDPOINT,
     credentials: {
         accessKeyId: process.env.S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
-    }
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+    },
 });
 
 export async function getResourceMetadata(file: string) {
-    return await S3.send(new HeadObjectCommand({
-        Bucket: bucket,
-        Key: file
-    }));
+    return await S3.send(
+        new HeadObjectCommand({
+            Bucket: bucket,
+            Key: file,
+        })
+    );
 }
 
 export async function getResourceCheckSum(file: string) {
@@ -46,38 +57,60 @@ export async function getResourceCheckSum(file: string) {
 
 export async function getResourceSize(file: string) {
     const size = await redis.get(`s3:${file}:size`);
+    if (size) return Number(size);
 
-    if (!size) {
+    try {
         const metadata = await getResourceMetadata(file);
-        await redis.set(`s3:${file}:size`, metadata.ContentLength || 0, { EX: REDIS_EXPIRED_IN });
-        
-        return Number(metadata.ContentLength || 0);
-    }
+        await redis.set(`s3:${file}:size`, metadata.ContentLength || 0, {
+            EX: REDIS_EXPIRED_IN,
+        });
 
-    return Number(size);
+        return Number(metadata.ContentLength || 0);
+    } catch (err: S3ServiceException | unknown) {
+        if (
+            err instanceof S3ServiceException &&
+            err.$metadata.httpStatusCode === 404
+        ) {
+            console.log(`[S3] File ${file} not found`);
+        } else {
+            console.error("[S3] Failed to get file metadata", err);
+        }
+        
+        return 0;
+    }
 }
 
 export async function getResourceSignedUrl(file: string, filename: string) {
-    return await getSignedUrl(S3, new GetObjectCommand({
-        Bucket: bucket,
-        Key: file,
-        ResponseContentDisposition: `attachment; filename="${filename}"`
-    }), { expiresIn: EXPIRED_IN });
+    return await getSignedUrl(
+        S3,
+        new GetObjectCommand({
+            Bucket: bucket,
+            Key: file,
+            ResponseContentDisposition: `attachment; filename="${filename}"`,
+        }),
+        { expiresIn: EXPIRED_IN }
+    );
 }
 
 export async function putResourceWithSignedUrl(file: string) {
-    return await getSignedUrl(S3, new PutObjectCommand({
-        Bucket: bucket,
-        Key: file,
-    }), { expiresIn: EXPIRED_IN });
+    return await getSignedUrl(
+        S3,
+        new PutObjectCommand({
+            Bucket: bucket,
+            Key: file,
+        }),
+        { expiresIn: EXPIRED_IN }
+    );
 }
 
 export async function getResourceMimeType(file: string) {
-    const data = await S3.send(new GetObjectCommand({
-        Bucket: bucket,
-        Key: file,
-        Range: "bytes=0-1024"
-    }));
+    const data = await S3.send(
+        new GetObjectCommand({
+            Bucket: bucket,
+            Key: file,
+            Range: "bytes=0-1024",
+        })
+    );
 
     if (!data.Body) {
         throw new Error("Failed to get object body from S3");
@@ -87,28 +120,44 @@ export async function getResourceMimeType(file: string) {
 
 // Multipart Upload
 export async function createResourceMultipartUpload(file: string) {
-    return await S3.send(new CreateMultipartUploadCommand({
-        Bucket: bucket,
-        Key: file
-    }));
+    return await S3.send(
+        new CreateMultipartUploadCommand({
+            Bucket: bucket,
+            Key: file,
+        })
+    );
 }
 
-export async function uploadResourcePartWithSignedUrl(file: string, partNumber: number, uploadId: string) {
-    return await getSignedUrl(S3, new UploadPartCommand({
-        Bucket: bucket,
-        Key: file,
-        PartNumber: partNumber,
-        UploadId: uploadId
-    }), { expiresIn: EXPIRED_IN });
+export async function uploadResourcePartWithSignedUrl(
+    file: string,
+    partNumber: number,
+    uploadId: string
+) {
+    return await getSignedUrl(
+        S3,
+        new UploadPartCommand({
+            Bucket: bucket,
+            Key: file,
+            PartNumber: partNumber,
+            UploadId: uploadId,
+        }),
+        { expiresIn: EXPIRED_IN }
+    );
 }
 
-export async function completeResourceMultipartUpload(file: string, uploadId: string, parts: { ETag: string, PartNumber: number }[]) {
-    return await S3.send(new CompleteMultipartUploadCommand({
-        Bucket: bucket,
-        Key: file,
-        UploadId: uploadId,
-        MultipartUpload: {
-            Parts: parts
-        }
-    }));
+export async function completeResourceMultipartUpload(
+    file: string,
+    uploadId: string,
+    parts: { ETag: string; PartNumber: number }[]
+) {
+    return await S3.send(
+        new CompleteMultipartUploadCommand({
+            Bucket: bucket,
+            Key: file,
+            UploadId: uploadId,
+            MultipartUpload: {
+                Parts: parts,
+            },
+        })
+    );
 }

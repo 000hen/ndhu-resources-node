@@ -6,7 +6,7 @@ import db from "~/db/client.server";
 import { resourceReport } from "~/db/schema";
 import { loader as rootLoader } from "~/root";
 import { getAuthInfo } from "~/utils.server";
-import { useOverflowHidden } from "~/overflowhidden";
+import { useOverflowHidden } from "~/hooks/overflowhidden";
 
 export const action: ActionFunction = async ({ request, context, params }) => {
     const user = await getAuthInfo({ request, context });

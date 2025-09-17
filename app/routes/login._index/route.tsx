@@ -29,20 +29,24 @@ export const action: ActionFunction = async ({ request }) => {
     const idToken = form.get("idToken")?.toString();
 
     invariant(idToken, "Missing token");
-    const data = await serverAuth.verifyIdToken(idToken) as unknown as DecodedIdToken;
-    const jwt = await serverAuth.createSessionCookie(idToken, { expiresIn: 60480000 });
+    const data = (await serverAuth.verifyIdToken(
+        idToken
+    )) as unknown as DecodedIdToken;
+    const jwt = await serverAuth.createSessionCookie(idToken, {
+        expiresIn: 60480000,
+    });
 
     const user = await db
         .select({
             premission: premissions.premission,
-            display: premissions.display
+            display: premissions.display,
         })
         .from(premissions)
         .where(eq(premissions.user_id, sql.placeholder("id")))
         .limit(1)
         .prepare()
         .execute({
-            id: data.sub
+            id: data.sub,
         });
 
     if (!user.length) {
@@ -51,15 +55,16 @@ export const action: ActionFunction = async ({ request }) => {
             .values({
                 user_id: sql.placeholder("id"),
                 premission: sql.placeholder("premission"),
-                display: sql.placeholder("display")
+                display: sql.placeholder("display"),
             })
             .prepare()
             .execute({
                 id: data.sub,
-                premission: (data.email_verified && checkIsNDHU(data.email || ""))
-                    ? Premission.VerifiedUser
-                    : Premission.User,
-                display: data.name
+                premission:
+                    data.email_verified && checkIsNDHU(data.email || "")
+                        ? Premission.VerifiedUser
+                        : Premission.User,
+                display: data.name,
             });
     }
 
@@ -67,12 +72,12 @@ export const action: ActionFunction = async ({ request }) => {
         await db
             .update(premissions)
             .set({
-                display: data.name
+                display: data.name,
             })
             .where(eq(premissions.user_id, sql.placeholder("id")))
             .prepare()
             .execute({
-                id: data.sub
+                id: data.sub,
             });
     }
 
@@ -81,8 +86,8 @@ export const action: ActionFunction = async ({ request }) => {
 
     return redirect(redirectPath, {
         headers: {
-            "Set-Cookie": await cookie.serialize(jwt)
-        }
+            "Set-Cookie": await cookie.serialize(jwt),
+        },
     });
 };
 
@@ -106,32 +111,65 @@ export default function LoginIndex() {
         navigate("/resources");
     }
 
-    return <div>
-        <div className="mb-5">
-            <h1 className="text-4xl text-black">登入/註冊</h1>
-        </div>
-        {
-            data?.auth && <>
-                <div className="card shadow-2xl p-3 bg-gray-800">
-                    <h2>使用已登入帳號繼續</h2>
-                    <div className="w-full grid place-content-center mb-5">
-                        <img referrerPolicy="no-referrer" className="rounded-full w-32" alt="Profile" src={data.profile || ""} />
-                    </div>
-                    <button onClick={signUpWithCurrentAccount} className="btn btn-success w-full shadow-xl">
-                        以 {data.display ?? ""} ({data.email}) 繼續
-                    </button>
-                </div>
-
-                <Hr>OR</Hr>
-            </>
-        }
+    return (
         <div>
-            <button onClick={signUpWithGoogle} className="block w-full btn btn-info">
-                <span className="flex items-center">
-                    <FaGoogle className="inline mr-2" />
-                    使用您的 Google 帳戶登入
-                </span>
+            <div className="mb-5">
+                <h1 className="text-4xl text-black">登入/註冊</h1>
+            </div>
+            {data?.auth && (
+                <>
+                    <AuthWithAccount
+                        display={data.display}
+                        email={data.email || ""}
+                        profile={data.profile}
+                        onClick={signUpWithCurrentAccount}
+                    />
+                    <Hr>OR</Hr>
+                </>
+            )}
+            <div>
+                <button
+                    onClick={signUpWithGoogle}
+                    className="block w-full btn btn-info"
+                >
+                    <span className="flex items-center">
+                        <FaGoogle className="inline mr-2" />
+                        使用您的 Google 帳戶登入
+                    </span>
+                </button>
+            </div>
+        </div>
+    );
+}
+
+function AuthWithAccount({
+    display,
+    email,
+    profile,
+    onClick,
+}: {
+    display: string;
+    email: string;
+    profile: string | undefined;
+    onClick: () => void;
+}) {
+    return (
+        <div className="card shadow-2xl p-3 bg-gray-800">
+            <h2>使用已登入帳號繼續</h2>
+            <div className="w-full grid place-content-center mb-5">
+                <img
+                    referrerPolicy="no-referrer"
+                    className="rounded-full w-32"
+                    alt="Profile"
+                    src={profile || ""}
+                />
+            </div>
+            <button
+                onClick={onClick}
+                className="btn btn-success w-full shadow-xl"
+            >
+                以 {display ?? ""} ({email}) 繼續
             </button>
         </div>
-    </div>;
+    );
 }

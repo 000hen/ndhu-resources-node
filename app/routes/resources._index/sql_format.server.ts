@@ -12,102 +12,119 @@ import { SortBy } from "./resources_interface";
 import { SubqueryWithSelection } from "drizzle-orm/mysql-core";
 import { ResourceInterface } from "~/types/resource";
 
-type SortByPopularity =
-    SubqueryWithSelection<
-        {
-            resource: typeof pushOrDump.resource;
-            popularity: SQL.Aliased<number>;
-        },
-        "mostPopular"
-    >;
+type SortByPopularity = SubqueryWithSelection<
+    {
+        resource: typeof pushOrDump.resource;
+        popularity: SQL.Aliased<number>;
+    },
+    "mostPopular"
+>;
 
-async function sortByPopularity(popularity: SortByPopularity): Promise<ResourceInterface[]> {
-    const pushOrDumps = await db
+async function sortByPopularity(
+    popularity: SortByPopularity
+): Promise<ResourceInterface[]> {
+    const start = performance.now();
+    const result = await db
         .select({
-            upvotes: sql`COUNT(CASE WHEN ${pushOrDump.isPush} > 0 THEN 1 END)`.mapWith(Number),
-            downvotes: sql`COUNT(CASE WHEN ${pushOrDump.isPush} < 0 THEN 1 END)`.mapWith(Number),
-            resource: pushOrDump.resource,
+            id: resources.id,
+            name: resources.name,
+            description: resources.description,
+            tags: resources.tags,
+            upload_by: resources.upload_by,
+            create_at: resources.create_at,
+            state: resources.state,
+            filename: resources.filename,
+            course: courses,
+            category: resourceCategory,
+            upvotes:
+                sql`SUM(CASE WHEN ${pushOrDump.isPush} > 0 THEN 1 ELSE 0 END)`.mapWith(
+                    Number
+                ),
+            downvotes:
+                sql`SUM(CASE WHEN ${pushOrDump.isPush} < 0 THEN 1 ELSE 0 END)`.mapWith(
+                    Number
+                ),
         })
-        .from(pushOrDump)
-        .leftJoin(popularity, eq(pushOrDump.resource, popularity.resource))
-        .groupBy(pushOrDump.resource);
-
-    // select most popular resources
-    const popularResources = await db
-        .select()
         .from(resources)
         .leftJoin(popularity, eq(resources.id, popularity.resource))
         .leftJoin(courses, eq(resources.courses, courses.id))
-        .leftJoin(resourceCategory, eq(resourceCategory.id, resources.type))
+        .leftJoin(resourceCategory, eq(resources.type, resourceCategory.id))
+        .leftJoin(pushOrDump, eq(resources.id, pushOrDump.resource))
+        .groupBy(resources.id, courses.id, resourceCategory.id)
         .orderBy(desc(popularity.popularity));
+    const end = performance.now();
+    console.log(`sortByPopularity query took ${end - start}ms`);
 
-    return popularResources.map((e) => ({
-        id: e.resources.id,
-        name: e.resources.name,
-        description: e.resources.description,
-        tags: e.resources.tags,
-        upload_by: e.resources.upload_by,
-        create_at: e.resources.create_at,
-        state: e.resources.state,
-        course: e.courses,
-        filename: e.resources.filename,
+    return result.map((e) => ({
+        id: e.id,
+        name: e.name,
+        description: e.description,
+        tags: e.tags,
+        upload_by: e.upload_by,
+        create_at: e.create_at,
+        state: e.state,
+        filename: e.filename,
+        course: e.course,
+        category: e.category,
         votes: {
-            up: pushOrDumps.find((v) => v.resource === e.resources.id)?.upvotes || 0,
-            down: pushOrDumps.find((v) => v.resource === e.resources.id)?.downvotes || 0,
+            up: e.upvotes,
+            down: e.downvotes,
         },
-        category: e.resourceCategory,
     }));
 }
 
-export async function sortByVotes(offset: number): Promise<ResourceInterface[]> {
-    const mostPopular = db
+function makePopularityQuery(
+    source:
+        | typeof pushOrDump
+        | typeof resourceDownloaded
+        | typeof userFavorites,
+    popularityExpr: SQL.Aliased<number>,
+    offset: number
+) {
+    return db
         .select({
-            resource: pushOrDump.resource,
-            popularity: sum(pushOrDump.isPush).mapWith(Number).as("popularity"),
+            resource: source.resource,
+            popularity: popularityExpr,
         })
-        .from(pushOrDump)
-        .groupBy(pushOrDump.resource)
+        .from(source)
+        .groupBy(source.resource)
         .orderBy(desc(sql`popularity`))
         .limit(20)
         .offset(offset)
         .as("mostPopular");
+}
 
+export async function sortByVotes(offset: number) {
+    const mostPopular = makePopularityQuery(
+        pushOrDump,
+        sum(pushOrDump.isPush).mapWith(Number).as("popularity"),
+        offset
+    );
     return await sortByPopularity(mostPopular);
 }
 
-export async function sortByDownloads(offset: number): Promise<ResourceInterface[]> {
-    const mostPopular = db
-        .select({
-            resource: resourceDownloaded.resource,
-            popularity: count().as("popularity"),
-        })
-        .from(resourceDownloaded)
-        .groupBy(resourceDownloaded.resource)
-        .orderBy(desc(sql`popularity`))
-        .limit(20)
-        .offset(offset)
-        .as("mostPopular");
-
+export async function sortByDownloads(offset: number) {
+    const mostPopular = makePopularityQuery(
+        resourceDownloaded,
+        count().as("popularity"),
+        offset
+    );
     return await sortByPopularity(mostPopular);
 }
 
-export async function sortByFavorite(offset: number): Promise<ResourceInterface[]> {
-    const mostPopular = db
-        .select({
-            resource: pushOrDump.resource,
-            popularity: count().as("popularity"),
-        })
-        .from(userFavorites)
-        .groupBy(userFavorites.resource)
-        .orderBy(desc(sql`popularity`))
-        .limit(20)
-        .offset(offset)
-        .as("mostPopular");
-
+export async function sortByFavorite(offset: number) {
+    const mostPopular = makePopularityQuery(
+        userFavorites,
+        count().as("popularity"),
+        offset
+    );
     return await sortByPopularity(mostPopular);
 }
 
-export async function sortByDefault(mode: SortBy, offset: number): Promise<ResourceInterface[]> {
+export async function sortByDefault(
+    mode: SortBy,
+    offset: number
+): Promise<ResourceInterface[]> {
     const resource = await db.query.resources
         .findMany({
             with: {
@@ -122,11 +139,11 @@ export async function sortByDefault(mode: SortBy, offset: number): Promise<Resou
             offset: sql.placeholder("offset"),
             orderBy: (v) => {
                 switch (mode) {
-                case SortBy.AZ:
-                    return v.name;
-                case SortBy.Time:
-                default:
-                    return desc(v.create_at);
+                    case SortBy.AZ:
+                        return v.name;
+                    case SortBy.Time:
+                    default:
+                        return desc(v.create_at);
                 }
             },
             limit: 20,
