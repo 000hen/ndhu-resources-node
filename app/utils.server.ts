@@ -4,7 +4,7 @@ import { auth as serverAuth } from "./firebase.server";
 import cookie from "./storage/cookies.server";
 import db from "./db/client.server";
 import { eq, sql } from "drizzle-orm";
-import crypto from "crypto";
+import crypto from "node:crypto";
 
 interface CheckLoginArgs {
     request: Request,
