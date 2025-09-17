@@ -2,6 +2,7 @@ import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import svgr from "vite-plugin-svgr";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   define: {
@@ -17,5 +18,6 @@ export default defineConfig({
     }),
     svgr(),
     tsconfigPaths(),
+    tailwindcss()
   ],
 });
