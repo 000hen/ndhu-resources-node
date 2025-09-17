@@ -5,7 +5,7 @@ import { resourceReviewer, resources } from "~/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { getResourceMimeType } from "~/storage/aws.server";
 import { isMimeSafe } from "~/utils";
-import { QueueTask } from "./queue_task";
+import { QueueTask } from "../classes/QueueTask";
 
 export default class Autoreviewer implements QueueTask {
     async process(job: Queue.Job<ProcessData>, done: () => void): Promise<void> {

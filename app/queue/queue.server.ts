@@ -1,5 +1,5 @@
 import Queue from "bull";
-import { NotImplementedTask, QueueTask } from "./queue_task";
+import { NotImplementedTask, QueueTask } from "../classes/QueueTask";
 import Autoreviewer from "./autoreviewer.server";
 import AutoRemoveUnuploaded from "./auto_remove_unuploaded";
 

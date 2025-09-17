@@ -1,5 +1,5 @@
 import Queue from "bull";
-import { QueueTask } from "./queue_task";
+import { QueueTask } from "../classes/QueueTask";
 import { ProcessData } from "./queue.server";
 import db from "~/db/client.server";
 import { resources } from "~/db/schema";

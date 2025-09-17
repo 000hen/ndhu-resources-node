@@ -1,5 +1,5 @@
 import Queue from "bull";
-import { ProcessData } from "./queue.server";
+import { ProcessData } from "../queue/queue.server";
 
 export interface QueueTask {
     process(job: Queue.Job<ProcessData>, done: () => void): Promise<void>;
