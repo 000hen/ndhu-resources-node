@@ -1,40 +1,19 @@
-# Welcome to Remix!
+# NDHU Resources
 
-- 📖 [Remix docs](https://remix.run/docs)
+This is the source code of [NDHU Resources](https://ndhures.cc), a resource sharing platform for National Dong Hwa University students.
+It is built with [Remix](https://remix.run) and uses [Firebase Authentication](https://firebase.google.com/products/auth) for user authentication and [Drizzle ORM](https://orm.drizzle.team) for database interactions.
 
-## Development
+## Features
 
-Run the dev server:
+- User authentication with Firebase
+- Resource upload and download
+- Resource categorization and tagging
+- User roles and permissions
 
-```shellscript
-npm run dev
-```
+## Contributing
 
-## Deployment
+Contributions are welcome! Please fork the repository and create a pull request with your changes.
 
-First, build your app for production:
+## License
 
-```sh
-npm run build
-```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-- `build/server`
-- `build/client`
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
