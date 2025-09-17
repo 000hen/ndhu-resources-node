@@ -39,7 +39,7 @@ export default function AboutIndex() {
             </div>
             <div className="card p-5 bg-neutral mt-2 md:mt-0">
                 <h1>關於本站</h1>
-                <p>本站為東華大學資訊工程學系學生製作的公開資源分享庫，所有學生皆可提供與取得各式各樣的資源。</p>
+                <p>本站為東華大學學生製作的公開資源分享庫，所有學生皆可提供與取得各式各樣的資源。</p>
             </div>
         </div>
     </div>
