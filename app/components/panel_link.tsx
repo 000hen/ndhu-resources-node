@@ -18,7 +18,7 @@ export default function PanelLink(configs: PanelLinkArgs) {
     return <Link
         onClick={configs.onClick}
         className={classFormat([
-            "p-5 my-1 hover:bg-gray-700 w-full rounded-lg text-xl flex items-center transition-colors",
+            "p-5 my-1 hover:bg-neutral w-full rounded-lg text-xl flex items-center transition-colors",
             configs.className,
             hightlight && "bg-base-100"
         ])}

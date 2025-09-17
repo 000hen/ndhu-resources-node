@@ -165,7 +165,7 @@ export default function Search() {
     ])}>
         <div className="min-w-0">
             <h1>您好！您想要找尋甚麼檔案？ </h1>
-            <label className="input rounded-full flex items-center gap-2 border-0 bg-neutral">
+            <label className="input w-full rounded-full flex items-center gap-2 border-0 bg-neutral">
                 <MdSearch />
                 <input
                     ref={searchBoxRef}
@@ -180,7 +180,7 @@ export default function Search() {
                 <h2>搜尋建議</h2>
                 <div className="flex flex-row flex-wrap gap-2 w-fit max-w-full">
                     {fetcher.data.map((v) => <button
-                        className="badge badge-accent truncate justify-start overflow-hidden"
+                        className="badge badge-accent truncate justify-start overflow-hidden cursor-pointer"
                         onClick={() => search(v.name)}
                         key={"search:suggest:resource:" + v.id}>
                         {v.name}
@@ -191,15 +191,7 @@ export default function Search() {
             {query && <div>
                 <GridViewPanel
                     isGridView={gridView}
-                    setGridView={setGridView}
-                    right={<>
-                        <JoinedButton tips="搜尋課程" isHighlighted={searchType === SearchType.Course} onClick={() => changeSearchType(SearchType.Course)}>
-                            <MdClass />
-                        </JoinedButton>
-                        <JoinedButton tips="搜尋資源" isHighlighted={searchType === SearchType.Resource} onClick={() => changeSearchType(SearchType.Resource)}>
-                            <MdDescription />
-                        </JoinedButton>
-                    </>} />
+                    setGridView={setGridView} />
 
                 {data.resources.length === 0 && <div className="card bg-neutral p-5">
                     <h2>找不到任何資源</h2>

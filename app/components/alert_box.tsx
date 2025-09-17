@@ -23,7 +23,7 @@ export function AlertBox(configs: AlertBoxProps) {
                         </button>
                     </div>
                 </div>
-                <div className="md:max-h-[80vh] overflow-auto p-2">
+                <div className="md:max-h-[80vh] overflow-x-hidden overflow-y-auto p-2">
                     {configs.children}
                 </div>
             </div>

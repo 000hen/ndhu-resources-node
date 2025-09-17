@@ -356,7 +356,7 @@ export default function ResourcePage() {
                                     </button>}
                                 {parentData?.auth && <>
                                         {(parentData.premission || 0) >= Premission.VerifiedUser
-                                        ? <button onClick={() => doAction(ActionType.Download)} className="btn btn-primary lg:min-w-60 w-full xl:w-40"><MdDownload size={16} />下載</button>
+                                        ? <button onClick={() => doAction(ActionType.Download)} className="btn btn-success lg:min-w-60 w-full xl:w-40"><MdDownload size={16} />下載</button>
                                         : <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">抱歉！您的權限不足，無法下載！</button>}
                                 </>}
                             </>}

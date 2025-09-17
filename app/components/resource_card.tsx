@@ -28,7 +28,7 @@ export function HashTagsFormat({ tags }: { tags?: string[] }) {
         <>
             {tags &&
                 tags.map((tag) => (
-                    <span key={tag} className="badge badge-accent mr-1">
+                    <span key={tag} className="badge badge-info mr-1">
                         #{tag}
                     </span>
                 ))}
@@ -42,8 +42,9 @@ export function HashTagsFormat({ tags }: { tags?: string[] }) {
 }
 
 export default function ResourceCardComponent(configs: ResourceCardArgs) {
-    const score =
-        (configs.votes?.upvotes || 0) - (configs.votes?.downvotes || 0);
+    const isVotes =
+        configs.votes &&
+        (configs.votes.upvotes > 0 || configs.votes.downvotes > 0);
 
     return (
         <Link
@@ -63,7 +64,7 @@ export default function ResourceCardComponent(configs: ResourceCardArgs) {
                 )}
                 <div className="col-span-3">
                     <div>
-                        <span className="inline-block text-4xl font-bold truncate overflow-hidden max-w-full">
+                        <span className="inline-block text-4xl font-bold truncate overflow-hidden max-w-full leading-14">
                             {configs.title}
                         </span>
                         <div
@@ -72,29 +73,17 @@ export default function ResourceCardComponent(configs: ResourceCardArgs) {
                             ])}
                         >
                             <div className="flex flex-wrap gap-y-1">
-                                {configs.votes && (
-                                    <>
-                                        <div
-                                            className="badge badge-warning bg-orange-300 tooltip"
-                                            data-tip="資源的熱門程度"
-                                        >
-                                            <div className="flex items-center mr-2">
-                                                <span>🔥</span>
-                                                <span>
-                                                    {!configs.votes.upvotes &&
-                                                    !configs.votes.downvotes ? (
-                                                        "尚未有評分"
-                                                    ) : (
-                                                        <NumberCardFormatComponent
-                                                            amount={score}
-                                                        />
-                                                    )}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="divider divider-horizontal mx-1"></div>
-                                    </>
+                                {isVotes && (
+                                    <VoteDisplay
+                                        votes={configs.votes as Votes}
+                                    />
                                 )}
+                                {!isVotes && (
+                                    <span className="italic text-gray-500">
+                                        尚未有評分
+                                    </span>
+                                )}
+                                <div className="divider divider-horizontal mx-1"></div>
                                 <HashTagsFormat tags={configs.tags} />
                             </div>
                         </div>
@@ -122,5 +111,25 @@ export default function ResourceCardComponent(configs: ResourceCardArgs) {
                 </div>
             </div>
         </Link>
+    );
+}
+
+function VoteDisplay({ votes }: { votes: Votes }) {
+    const score = votes.upvotes - votes.downvotes;
+
+    return (
+        <>
+            <div
+                className="badge badge-warning tooltip"
+                data-tip="資源的熱門程度"
+            >
+                <div className="flex items-center mr-2">
+                    <span>🔥</span>
+                    <span>
+                        <NumberCardFormatComponent amount={score} />
+                    </span>
+                </div>
+            </div>
+        </>
     );
 }

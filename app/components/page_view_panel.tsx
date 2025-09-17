@@ -49,7 +49,7 @@ export default function PageViewPanel(configs: PageViewPanelArgs) {
                     <div className="tooltip" data-tip="輸入頁數，按下 Enter 或點擊旁邊空白處即可跳轉">
                         <input
                             ref={inputRef}
-                            className="input hover:bg-slate-600 w-10 p-0 text-center bg-neutral transition-all"
+                            className="input hover:bg-gray-600 w-10 p-0 bg-neutral transition-all border-0 text-center text-md"
                             onBlur={inputChangePage}
                             onKeyUp={(inp) => inp.key === "Enter" && inputChangePage()}
                             type="number"
