@@ -9,8 +9,8 @@ export default function LoginLayout() {
                 </div>
             </div>
             <div className="md:absolute w-full md:text-white text-center translate-y-2">
-                <Link className="after:content-['•'] after:px-2" to={"/policy/service"}>服務條款</Link>
-                <Link to={"/policy/privacy"}>隱私權政策</Link>
+                {/* <Link className="after:content-['•'] after:px-2" to={"/policy/service"}>服務條款</Link> */}
+                <Link to={"https://muisnowdevs.one/privacy"}>隱私權政策</Link>
             </div>
         </div>
     </div>;
