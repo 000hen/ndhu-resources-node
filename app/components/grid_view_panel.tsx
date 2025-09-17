@@ -1,16 +1,19 @@
 import { MdGridView, MdViewAgenda } from "react-icons/md";
 import JoinedButton from "./joined_button";
 import ResourcePanel from "./panel";
+import { JSX } from "react";
+import { classFormat } from "~/utils";
 
 interface GridViewPanelArgs {
     isGridView: boolean,
+    className?: string,
     setGridView: (value: boolean) => void,
     right?: JSX.Element,
     left?: JSX.Element
 }
 
 export default function GridViewPanel(configs: GridViewPanelArgs) {
-    return <ResourcePanel className="sticky">
+    return <ResourcePanel className={classFormat(["sticky", configs.className])}>
         <div className="flex justify-between">
             <div>{configs.left}</div>
             <div className="flex flex-row">

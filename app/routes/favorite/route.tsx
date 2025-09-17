@@ -99,7 +99,7 @@ export default function FavoritePage() {
 
     return (
         <div>
-            <GridViewPanel isGridView={gridView} setGridView={setGridView} />
+            <GridViewPanel className="md:block hidden" isGridView={gridView} setGridView={setGridView} />
 
             <div
                 className={classFormat([

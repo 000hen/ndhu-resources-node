@@ -104,7 +104,7 @@ export default function ResourcesIndex() {
                 <GridViewPanel
                     isGridView={gridView}
                     setGridView={setGridView}
-                    left={<PanelLeftView permission={parentData?.premission} />}
+                    left={<PanelLeftView permission={parentData?.premission ?? 0} />}
                     right={
                         <PanelRightView sort={sort} changeSort={changeSort} />
                     }
@@ -150,7 +150,7 @@ export default function ResourcesIndex() {
     );
 }
 
-function PanelLeftView({ permission }: { permission: number | undefined }) {
+function PanelLeftView({ permission }: { permission: number }) {
     return (
         <>
             <div
@@ -161,7 +161,7 @@ function PanelLeftView({ permission }: { permission: number | undefined }) {
                     <MdSearch />
                 </Link>
             </div>
-            {permission && permission >= Premission.VerifiedUser && (
+            {permission >= Premission.VerifiedUser && (
                 <Link to={"new"} className="btn btn-success">
                     <MdAdd className="block" />
                     <span className="hidden sm:block">新增資源</span>
