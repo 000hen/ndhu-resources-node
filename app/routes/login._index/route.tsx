@@ -1,6 +1,6 @@
 import { ActionFunction, redirect, MetaFunction } from "@remix-run/node";
-import { FaGoogle } from "react-icons/fa";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { FaUser } from "react-icons/fa";
+import { getAdditionalUserInfo, OAuthProvider, signInWithPopup, updateProfile } from "firebase/auth";
 import { auth as clientAuth } from "~/firebase.client";
 import { auth as serverAuth } from "~/firebase.server";
 import { useFetcher, useNavigate, useRouteLoaderData } from "@remix-run/react";
@@ -100,10 +100,16 @@ export default function LoginIndex() {
         fetcher.submit({ idToken }, { method: "post" });
     }
 
-    function signUpWithGoogle() {
-        const provider = new GoogleAuthProvider();
+    function signUpWithMuID() {
+        const provider = new OAuthProvider("oidc.muid");
         signInWithPopup(clientAuth, provider)
-            .then((result) => result.user.getIdToken())
+            .then(async (result) => {
+                const additionalUserInfo = getAdditionalUserInfo(result);
+                await updateProfile(result.user, {
+                    photoURL: additionalUserInfo?.profile?.picture as string,
+                });
+                return result.user.getIdToken();
+            })
             .then((token) => sendIdToken(token));
     }
 
@@ -129,12 +135,12 @@ export default function LoginIndex() {
             )}
             <div>
                 <button
-                    onClick={signUpWithGoogle}
+                    onClick={signUpWithMuID}
                     className="block w-full btn btn-info"
                 >
                     <span className="flex items-center">
-                        <FaGoogle className="inline mr-2" />
-                        使用您的 Google 帳戶登入
+                        <FaUser className="inline mr-2" />
+                        使用您的 MuID 帳戶登入
                     </span>
                 </button>
             </div>
