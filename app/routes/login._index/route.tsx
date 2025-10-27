@@ -1,9 +1,19 @@
 import { ActionFunction, redirect, MetaFunction } from "@remix-run/node";
 import { FaUser } from "react-icons/fa";
-import { getAdditionalUserInfo, OAuthProvider, signInWithPopup, updateProfile } from "firebase/auth";
+import {
+    getAdditionalUserInfo,
+    OAuthProvider,
+    signInWithPopup,
+    updateProfile,
+} from "firebase/auth";
 import { auth as clientAuth } from "~/firebase.client";
 import { auth as serverAuth } from "~/firebase.server";
-import { useFetcher, useNavigate, useRouteLoaderData } from "@remix-run/react";
+import {
+    Link,
+    useFetcher,
+    useNavigate,
+    useRouteLoaderData,
+} from "@remix-run/react";
 import invariant from "tiny-invariant";
 import cookie from "~/storage/cookies.server";
 import Hr from "~/components/hr";
@@ -120,7 +130,10 @@ export default function LoginIndex() {
     return (
         <div>
             <div className="mb-5">
-                <h1 className="text-4xl text-black">登入/註冊</h1>
+                <h1 className="text-4xl text-black mb-0">登入/註冊</h1>
+                <span className="text-sm text-gray-500 mt-2 block max-w-96">
+                    請注意！我們僅提供 @gms.ndhu.edu.tw 的使用者使用
+                </span>
             </div>
             {data?.auth && (
                 <>
@@ -143,6 +156,16 @@ export default function LoginIndex() {
                         使用您的 MuID 帳戶登入
                     </span>
                 </button>
+                <p className="text-xs text-gray-500 mt-3 mb-0">
+                    若您使用 MuID 登入，即代表您已悉知並同意⟪
+                    <Link
+                        to="https://muisnowdevs.one/privacy"
+                        className="underline"
+                    >
+                        Muisnow Devs 隱私權政策
+                    </Link>
+                    ⟫
+                </p>
             </div>
         </div>
     );
