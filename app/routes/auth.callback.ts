@@ -25,8 +25,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
         token.claims()?.sub ?? ""
     );
 
-    console.log("Fetched user info:", user);
-
     const fbUser = await auth
         .getUserByEmail(user.email!)
         .then(async (userRecord) => {
