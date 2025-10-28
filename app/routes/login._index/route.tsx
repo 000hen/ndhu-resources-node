@@ -174,7 +174,7 @@ export default function LoginIndex() {
                     </span>
                 </button>
                 <p className="text-xs text-gray-500 mt-3 mb-0">
-                    若您使用 MuID 登入，即代表您已悉知並同意⟪
+                    若您使用 MuID 登入，即代表您已知悉並同意⟪
                     <Link
                         to="https://muisnowdevs.one/privacy"
                         className="underline"
