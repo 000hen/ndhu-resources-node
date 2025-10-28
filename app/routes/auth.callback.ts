@@ -7,16 +7,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const token = await authorizationCodeGrant(
         resource,
-        url,
+        request,
         {
             expectedState: url.searchParams.get("state") || undefined,
         },
-        {
-            redirect_uri: new URL(
-                "/auth/callback",
-                process.env.APP_URL!
-            ).toString(),
-        }
     );
 
     const user = await fetchUserInfo(
