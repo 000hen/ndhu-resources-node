@@ -31,6 +31,7 @@
     "isbot": "5.1.30",
     "mysql2": "3.15.0",
     "nodemailer": "7.0.6",
+    "openid-client": "^6.8.1",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "react-icons": "5.5.0",

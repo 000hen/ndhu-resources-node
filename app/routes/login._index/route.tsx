@@ -1,11 +1,5 @@
 import { ActionFunction, redirect, MetaFunction } from "@remix-run/node";
 import { FaUser } from "react-icons/fa";
-import {
-    getAdditionalUserInfo,
-    OAuthProvider,
-    signInWithPopup,
-    updateProfile,
-} from "firebase/auth";
 import { auth as clientAuth } from "~/firebase.client";
 import { auth as serverAuth } from "~/firebase.server";
 import {
@@ -23,6 +17,7 @@ import { eq, sql } from "drizzle-orm";
 import { checkIsNDHU, Premission } from "~/utils";
 import { loader as rootLoader } from "~/root";
 import { DecodedIdToken } from "~/types/firebase";
+import { signInWithCustomToken } from "firebase/auth";
 
 export const meta: MetaFunction = () => {
     return [
@@ -110,17 +105,39 @@ export default function LoginIndex() {
         fetcher.submit({ idToken }, { method: "post" });
     }
 
+    // function signUpWithMuID() {
+    //     const provider = new OAuthProvider("oidc.muid");
+    //     signInWithPopup(clientAuth, provider)
+    //         .then(async (result) => {
+    //             const additionalUserInfo = getAdditionalUserInfo(result);
+    //             await updateProfile(result.user, {
+    //                 photoURL: additionalUserInfo?.profile?.picture as string,
+    //             });
+    //             return result.user.getIdToken();
+    //         })
+    //         .then((token) => sendIdToken(token));
+    // }
+
     function signUpWithMuID() {
-        const provider = new OAuthProvider("oidc.muid");
-        signInWithPopup(clientAuth, provider)
-            .then(async (result) => {
-                const additionalUserInfo = getAdditionalUserInfo(result);
-                await updateProfile(result.user, {
-                    photoURL: additionalUserInfo?.profile?.picture as string,
-                });
-                return result.user.getIdToken();
-            })
-            .then((token) => sendIdToken(token));
+        const popup = window.open(
+            "/auth/muid",
+            "MuID Login",
+            "width=500,height=600"
+        );
+
+        const receiveMessage = (event: MessageEvent) => {
+            if (event.origin !== window.location.origin) return;
+            if (event.data?.token) {
+                popup?.close();
+                popup?.removeEventListener("message", receiveMessage);
+
+                signInWithCustomToken(clientAuth, event.data.token)
+                    .then((result) => result.user.getIdToken())
+                    .then((token) => sendIdToken(token));
+            }
+        };
+
+        popup?.addEventListener("message", receiveMessage);
     }
 
     function signUpWithCurrentAccount() {
