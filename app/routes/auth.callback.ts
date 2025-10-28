@@ -4,7 +4,12 @@ import { resource } from "~/auth/muid.server";
 import { auth } from "~/firebase.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-    const url = new URL(request.url, process.env.APP_URL!);
+    const url = new URL(request.url);
+    const base = new URL(process.env.APP_URL!);
+
+    url.protocol = base.protocol;
+    url.host = base.host;
+
     const token = await authorizationCodeGrant(
         resource,
         url,
