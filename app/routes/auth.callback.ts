@@ -4,10 +4,10 @@ import { resource } from "~/auth/muid.server";
 import { auth } from "~/firebase.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-    const url = new URL(request.url);
+    const url = new URL(request.url, process.env.APP_URL!);
     const token = await authorizationCodeGrant(
         resource,
-        request,
+        url,
         {
             expectedState: url.searchParams.get("state") || undefined,
         },
