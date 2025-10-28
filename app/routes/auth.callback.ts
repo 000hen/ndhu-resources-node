@@ -1,16 +1,23 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import {
-    authorizationCodeGrant,
-    fetchUserInfo,
-} from "openid-client";
+import { authorizationCodeGrant, fetchUserInfo } from "openid-client";
 import { resource } from "~/auth/muid.server";
 import { auth } from "~/firebase.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const url = new URL(request.url);
-    const token = await authorizationCodeGrant(resource, url, {
-        expectedState: url.searchParams.get("state") || undefined,
-    });
+    const token = await authorizationCodeGrant(
+        resource,
+        url,
+        {
+            expectedState: url.searchParams.get("state") || undefined,
+        },
+        {
+            redirect_uri: new URL(
+                "/auth/callback",
+                process.env.APP_URL!
+            ).toString(),
+        }
+    );
 
     const user = await fetchUserInfo(
         resource,
