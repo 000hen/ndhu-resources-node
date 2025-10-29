@@ -51,7 +51,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
             window.postMessage({
                 token: ${JSON.stringify(customToken)}
             }, window.location.origin);
-            window.close();
         </script>
         `,
         { headers: { "Content-Type": "text/html" } }
