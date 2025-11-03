@@ -127,9 +127,9 @@ export default function LoginIndex() {
 
         const receiveMessage = (event: MessageEvent) => {
             if (event.origin !== window.location.origin) return;
-            if (event.data?.token) {
+            if (event.data?.type === "muid-callback" && event.data?.token) {
                 popup?.close();
-                popup?.removeEventListener("message", receiveMessage);
+                window?.removeEventListener("message", receiveMessage);
 
                 signInWithCustomToken(clientAuth, event.data.token)
                     .then((result) => result.user.getIdToken())
@@ -137,7 +137,7 @@ export default function LoginIndex() {
             }
         };
 
-        popup?.addEventListener("message", receiveMessage);
+        window?.addEventListener("message", receiveMessage);
     }
 
     function signUpWithCurrentAccount() {

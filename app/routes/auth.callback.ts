@@ -10,13 +10,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     url.protocol = base.protocol;
     url.host = base.host;
 
-    const token = await authorizationCodeGrant(
-        resource,
-        url,
-        {
-            expectedState: url.searchParams.get("state") || undefined,
-        },
-    );
+    const token = await authorizationCodeGrant(resource, url, {
+        expectedState: url.searchParams.get("state") || undefined,
+    });
 
     const user = await fetchUserInfo(
         resource,
@@ -48,9 +44,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return new Response(
         `
         <script>
-            window.postMessage({
-                token: ${JSON.stringify(customToken)}
-            }, window.location.origin);
+            const delay = ms => new Promise(res => setTimeout(res, ms));
+            (async () => {
+                while (true) {
+                    window.opener.postMessage({
+                        type: "muid-callback",
+                        token: ${JSON.stringify(customToken)}
+                    }, window.location.origin);
+                    await delay(100);
+                }
+            })();
         </script>
         `,
         { headers: { "Content-Type": "text/html" } }
