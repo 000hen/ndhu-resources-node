@@ -10,7 +10,7 @@ interface FooterButtonArgs extends PropsWithChildren {
 }
 
 export default function FooterButtonComponent(configs: FooterButtonArgs) {
-    return <div className="flex-auto w-fit m-2">
+    return <div className="flex-auto w-fit">
         <Link
             className={classFormat([
                 "btn flex flex-row w-full justify-center",
