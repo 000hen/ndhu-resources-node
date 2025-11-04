@@ -1,7 +1,7 @@
 import {
     ActionFunctionArgs,
     isRouteErrorResponse,
-    redirect,
+    redirectDocument,
     useFetcher,
     useRouteError,
     useRouteLoaderData,
@@ -72,11 +72,7 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
         throw new Response("Invalid description length.", { status: 400 });
     }
 
-    const tags = tagsInput
-        .split(",")
-        .map((e) => e.trim())
-        .filter((e) => e.length > 0 && e.length <= 50)
-        .slice(0, 20);
+    const tags = tagsInput.split(",").map((e) => e.trim());
 
     if (state) {
         if (auth.premission! < Premission.Editor) {
@@ -101,12 +97,12 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
         .set({
             name: title,
             description: description,
-            tags: tags,
+            tags: tags.length > 0 ? tags : null,
         })
         .where(eq(resources.id, resourceId))
         .execute();
 
-    return redirect("..");
+    return redirectDocument("..");
 }
 
 export default function ResourceEditIndex() {
