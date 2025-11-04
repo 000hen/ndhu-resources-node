@@ -81,8 +81,7 @@ function makePopularityQuery(
         | typeof pushOrDump
         | typeof resourceDownloaded
         | typeof userFavorites,
-    popularityExpr: SQL.Aliased<number>,
-    offset: number
+    popularityExpr: SQL.Aliased<number>
 ) {
     return db
         .select({
@@ -92,16 +91,13 @@ function makePopularityQuery(
         .from(source)
         .groupBy(source.resource)
         .orderBy(desc(sql`popularity`))
-        .limit(20)
-        .offset(offset)
         .as("mostPopular");
 }
 
 export async function sortByVotes(offset: number) {
     const mostPopular = makePopularityQuery(
         pushOrDump,
-        sum(pushOrDump.isPush).mapWith(Number).as("popularity"),
-        offset
+        sum(pushOrDump.isPush).mapWith(Number).as("popularity")
     );
     return await sortByPopularity(mostPopular, offset);
 }
@@ -109,8 +105,7 @@ export async function sortByVotes(offset: number) {
 export async function sortByDownloads(offset: number) {
     const mostPopular = makePopularityQuery(
         resourceDownloaded,
-        count().as("popularity"),
-        offset
+        count().as("popularity")
     );
     return await sortByPopularity(mostPopular, offset);
 }
@@ -118,8 +113,7 @@ export async function sortByDownloads(offset: number) {
 export async function sortByFavorite(offset: number) {
     const mostPopular = makePopularityQuery(
         userFavorites,
-        count().as("popularity"),
-        offset
+        count().as("popularity")
     );
     return await sortByPopularity(mostPopular, offset);
 }
