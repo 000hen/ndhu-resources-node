@@ -97,7 +97,7 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
         .set({
             name: title,
             description: description,
-            tags: tags.length > 0 ? tags : null,
+            tags: tags.length > 0 ? tags : defaultData.tags,
         })
         .where(eq(resources.id, resourceId))
         .execute();
