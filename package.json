@@ -24,6 +24,7 @@
     "@react-router/serve": "^7.0.0",
     "bull": "4.16.5",
     "daisyui": "5.1.12",
+    "dotenv": "^17.2.3",
     "drizzle-orm": "0.44.5",
     "file-type": "21.0.0",
     "firebase": "12.2.1",
