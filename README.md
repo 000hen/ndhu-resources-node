@@ -4,7 +4,7 @@
 > Because of Muisnow Devs' strategic adjustment, login methods will only support MuID, and other login methods will be deprecated in the future. If you want to use different login methods, please fork the project and deploy it yourself.
 
 This is the source code of [NDHU Resources](https://ndhures.cc), a resource sharing platform for National Dong Hwa University students.
-It is built with [Remix](https://remix.run) and uses [Firebase Authentication](https://firebase.google.com/products/auth) for user authentication and [Drizzle ORM](https://orm.drizzle.team) for database interactions.
+It is built with [React Router v7](https://reactrouter.com/) and uses [Firebase Authentication](https://firebase.google.com/products/auth) for user authentication and [Drizzle ORM](https://orm.drizzle.team) for database interactions.
 
 > [!NOTE]
 > I'm sorry for the messy code. This project is a early prototype and is not clean enough for public use.
