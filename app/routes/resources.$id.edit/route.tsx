@@ -13,7 +13,7 @@ import { isInState, Premission } from "~/utils";
 import RequiredSign from "~/components/reqired_sign";
 import { getAuthInfoWithPremission } from "~/utils.server";
 import db from "~/db/client.server";
-import { resources } from "~/db/schema";
+import { resourceReviewer, resources } from "~/db/schema";
 import invariant from "tiny-invariant";
 import { eq } from "drizzle-orm";
 
@@ -89,6 +89,16 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
             .update(resources)
             .set({ state: state })
             .where(eq(resources.id, resourceId))
+            .execute();
+
+        await db
+            .insert(resourceReviewer)
+            .values({
+                resource: resourceId,
+                reviewer: auth.id,
+                reason: "state.changed.by.admin",
+                state,
+            })
             .execute();
     }
 
