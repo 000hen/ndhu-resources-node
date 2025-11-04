@@ -1,4 +1,4 @@
-import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Outlet, useLoaderData, useMatches } from "@remix-run/react";
 import { PropsWithChildren } from "react";
 import { FaUser } from "react-icons/fa";
@@ -15,7 +15,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     if (auth.premission < Premission.Editor)
         return redirect("/");
 
-    return json({ premission: auth.premission });
+    return { premission: auth.premission };
 }
 
 interface AdminNavigateLinkArgs extends PropsWithChildren {

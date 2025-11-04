@@ -1,4 +1,4 @@
-import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { getAuthInfo, redirectToLogin } from "~/utils.server";
 import db from "~/db/client.server";
 import { count, desc, eq, sql } from "drizzle-orm";
@@ -65,7 +65,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
             offset: offset,
         });
 
-    return json({
+    return {
         size: favoritesLength[0].count,
         favorites: favorites.map((e) => ({
             id: e.resource.id,
@@ -81,7 +81,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
             },
             category: e.resource.category,
         })),
-    });
+    };
 }
 
 export default function FavoritePage() {

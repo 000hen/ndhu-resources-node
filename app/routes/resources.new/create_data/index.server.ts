@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, json } from "@remix-run/node";
+import { ActionFunctionArgs } from "@remix-run/node";
 import { sql } from "drizzle-orm";
 import db from "~/db/client.server";
 import { courses, resourceCategory } from "~/db/schema";
@@ -11,9 +11,9 @@ export async function loader() {
         })
         .from(resourceCategory);
 
-    return json({
+    return {
         category: categories
-    });
+    };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -23,7 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (!query)
         return null;
 
-    return json(await courseSuggestions(query));
+    return await courseSuggestions(query);
 }
 
 async function courseSuggestions(query: string) {

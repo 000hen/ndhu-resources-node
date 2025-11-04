@@ -1,6 +1,5 @@
 import {
     ActionFunctionArgs,
-    json,
     LoaderFunctionArgs,
     MetaFunction,
 } from "@remix-run/node";
@@ -26,10 +25,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const offset = Number(searchParams.get("page") || 1) * 20 - 20;
 
     if (!query || offset < 0)
-        return json({
+        return {
             length: 0,
             resources: [],
-        });
+        };
 
     // TODO: Implement search type
     // const searchType = searchParams.get("searchType") as SearchType || SearchType.Resource;
@@ -72,7 +71,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
             offset,
         });
 
-    return json({
+    return {
         length: length[0].count,
         resources: data.map((e) => ({
             id: e.id,
@@ -89,7 +88,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
             },
             category: e.category,
         })),
-    });
+    };
 }
 
 export const meta: MetaFunction<typeof loader> = ({ location }) => {
@@ -107,7 +106,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     if (!query) return null;
 
-    return json(await searchSuggestions(query));
+    return await searchSuggestions(query);
 }
 
 async function searchSuggestions(query: string) {

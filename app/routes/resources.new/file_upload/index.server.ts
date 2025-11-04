@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { Premission } from "~/utils";
 import { AuthedInfo, createServerValidation, getAuthInfoWithPremission, redirectToLogin, validateServerValidation } from "~/utils.server";
 import { ClientActionType, RequestPreSignedPUT, RequestUploadDone, ServerAction, ServerActionType } from "./types";
@@ -23,11 +23,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     switch (action) {
         case ClientActionType.RequestUpload:
-            return json(await handleRequestUpload(payload, auth));
+            return await handleRequestUpload(payload, auth);
         case ClientActionType.RequestPreSignedPUT:
-            return json(await handlePreSigned(payload));
+            return await handlePreSigned(payload);
         case ClientActionType.RequestUploadDone:
-            return json(await handleUploadSuccess(payload));
+            return await handleUploadSuccess(payload);
     }
 }
 

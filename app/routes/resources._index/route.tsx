@@ -1,4 +1,4 @@
-import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { count } from "drizzle-orm";
 import ResourceCardComponent from "../../components/resource_card";
 import db from "~/db/client.server";
@@ -68,10 +68,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
             resourcesList = await sortByDefault(sortBy, offset);
     }
 
-    return json({
+    return {
         size: resourcesLength[0].count,
         resources: resourcesList,
-    });
+    };
 }
 
 export default function ResourcesIndex() {

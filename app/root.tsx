@@ -25,7 +25,7 @@ import {
 import PanelLink from "./components/panel_link";
 import { IconType } from "react-icons";
 import LogoComponent from "./components/logos/logo";
-import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { AuthInfo, getAuthInfoWithPremission } from "./utils.server";
 import { FaGithub, FaUser } from "react-icons/fa";
 import { googleImageResize, Premission } from "./utils";
@@ -50,7 +50,7 @@ interface Pages {
 export async function loader({ request, context }: LoaderFunctionArgs) {
     const auth = await getAuthInfoWithPremission({ request, context });
 
-    return json(auth);
+    return auth;
 }
 
 function pages(auth: AuthInfo): Pages {

@@ -1,4 +1,4 @@
-import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { eq, sql } from "drizzle-orm";
 import { MdEdit, MdLocalPolice, MdLogout, MdNoAccounts, MdStorage, MdThumbDown, MdThumbUp, MdVerified } from "react-icons/md";
@@ -53,10 +53,10 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
             id: auth.id
         });
 
-    return json({
+    return {
         ...auth,
         ...user
-    })
+    };
 }
 
 interface StatusCardComponentArgs extends PropsWithChildren {

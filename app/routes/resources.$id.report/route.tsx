@@ -1,7 +1,7 @@
 import { useFetcher, useNavigate, useRouteLoaderData } from "@remix-run/react";
 import { PropsWithChildren } from "react";
 import { ReportType } from "./types";
-import { ActionFunction, json } from "@remix-run/node";
+import { ActionFunction } from "@remix-run/node";
 import db from "~/db/client.server";
 import { resourceReport } from "~/db/schema";
 import { loader as rootLoader } from "~/root";
@@ -23,7 +23,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
         reason: form.get("reason") as string | null,
     });
 
-    return json({ success: true });
+    return { success: true };
 };
 
 interface ReportRadioArgs extends PropsWithChildren {
