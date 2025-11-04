@@ -21,6 +21,7 @@ import {
     MdCategory,
     MdClass,
     MdDownload,
+    MdEdit,
     MdFlag,
     MdInsertDriveFile,
 } from "react-icons/md";
@@ -35,11 +36,7 @@ import VoteComponent from "./vote_button";
 import FavoriteButtonComponent from "./favorite_button";
 import { AlertBox } from "~/components/alert_box";
 
-export async function loader({
-    params,
-    context,
-    request,
-}: LoaderFunctionArgs) {
+export async function loader({ params, context, request }: LoaderFunctionArgs) {
     const auth = await getAuthInfoWithPremission({ request, context });
 
     const { id } = params;
@@ -413,63 +410,64 @@ export default function ResourcePage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mt-5 min-w-max">
-                                {(data.state == "pending" ||
-                                    data.state == "uploading") && (
+                            <div className="mt-5 min-w-max flex flex-row gap-2">
+                                {data.state !== "approved" && (
                                     <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">
-                                        檔案正在審核中，暫時不開放下載
+                                        {data.state === "pending" ||
+                                        data.state === "uploading"
+                                            ? "檔案正在審核中，暫時不開放下載"
+                                            : data.state === "rejected"
+                                              ? "檔案已被拒絕，您無法下載"
+                                              : "因版權問題已被下架，您無法下載"}
                                     </button>
                                 )}
-                                {data.state == "rejected" && (
-                                    <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">
-                                        檔案已被拒絕，您無法下載
+                                {data.state === "approved" &&
+                                    !parentData?.auth && (
+                                        <button
+                                            onClick={() =>
+                                                navigate(
+                                                    "/login?return=" +
+                                                        encodeURIComponent(
+                                                            location.pathname
+                                                        )
+                                                )
+                                            }
+                                            className="btn lg:min-w-60 w-full xl:w-40"
+                                        >
+                                            請先登入至東華資源庫
+                                        </button>
+                                    )}
+                                {data.state === "approved" &&
+                                    parentData?.auth && (
+                                        <button
+                                            onClick={() =>
+                                                doAction(ActionType.Download)
+                                            }
+                                            disabled={
+                                                (parentData.premission || 0) <
+                                                Premission.VerifiedUser
+                                            }
+                                            className="btn btn-success lg:min-w-60 w-full xl:w-40"
+                                        >
+                                            {(parentData.premission || 0) >=
+                                            Premission.VerifiedUser ? (
+                                                <>
+                                                    <MdDownload size={16} />
+                                                    下載
+                                                </>
+                                            ) : (
+                                                "抱歉！您的權限不足，無法下載！"
+                                            )}
+                                        </button>
+                                    )}
+
+                                {((parentData?.auth &&
+                                    parentData.id === data.upload_by) ||
+                                    (parentData?.premission ?? 0) >=
+                                        Premission.Editor) && (
+                                    <button className="btn btn-neutral w-10 p-2" onClick={() => navigate("edit")}>
+                                        <MdEdit size={32} />
                                     </button>
-                                )}
-                                {data.state == "DMCA takedown" && (
-                                    <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">
-                                        因版權問題已被下架，您無法下載
-                                    </button>
-                                )}
-                                {data.state == "approved" && (
-                                    <>
-                                        {!parentData?.auth && (
-                                            <button
-                                                onClick={() =>
-                                                    navigate(
-                                                        "/login?return=" +
-                                                            encodeURIComponent(
-                                                                location.pathname
-                                                            )
-                                                    )
-                                                }
-                                                className="btn lg:min-w-60 w-full xl:w-40"
-                                            >
-                                                請先登入至東華資源庫
-                                            </button>
-                                        )}
-                                        {parentData?.auth && (
-                                            <>
-                                                {(parentData.premission || 0) >=
-                                                Premission.VerifiedUser ? (
-                                                    <button
-                                                        onClick={() =>
-                                                            doAction(
-                                                                ActionType.Download
-                                                            )
-                                                        }
-                                                        className="btn btn-success lg:min-w-60 w-full xl:w-40"
-                                                    >
-                                                        <MdDownload size={16} />
-                                                        下載
-                                                    </button>
-                                                ) : (
-                                                    <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">
-                                                        抱歉！您的權限不足，無法下載！
-                                                    </button>
-                                                )}
-                                            </>
-                                        )}
-                                    </>
                                 )}
                             </div>
                         </div>

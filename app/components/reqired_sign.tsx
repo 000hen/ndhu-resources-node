@@ -1,3 +1,3 @@
 export default function RequiredSign() {
-    return <span style={{ color: 'red' }}>*</span>
+    return <span className="text-red-500 tooltip" data-tip="必填">*</span>
 }

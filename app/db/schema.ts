@@ -87,7 +87,8 @@ export const tagTypes = customType<{ data: string[], driverData: string }>({
     toDriver: (value: string[]) => value.join(", "),
     fromDriver: (value: string) => value.split(", ")
 });
-const stateEnums = ["uploading", "pending", "approved", "rejected", "DMCA takedown"] as const;
+export const stateEnums = ["uploading", "pending", "approved", "rejected", "DMCA takedown"] as const;
+export type StateEnum = (typeof stateEnums)[number];
 
 export const resources = mysqlTable("resources", {
     id: int("id")
