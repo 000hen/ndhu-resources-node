@@ -1,4 +1,4 @@
-import { redirect } from "@remix-run/node";
+import { redirect } from "react-router";
 import cookie from "~/storage/cookies.server";
 
 export async function loader() {

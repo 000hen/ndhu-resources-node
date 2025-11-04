@@ -1,4 +1,4 @@
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "react-router";
 import { useEffect, useReducer, useRef, useState } from "react";
 import RequiredSign from "~/components/reqired_sign";
 import CourseSearchCard from "../course_search_card";

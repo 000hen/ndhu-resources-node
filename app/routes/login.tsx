@@ -1,4 +1,4 @@
-import { Link, Outlet } from "@remix-run/react";
+import { Link, Outlet } from "react-router";
 
 export default function LoginLayout() {
     return <div className="md:grid md:place-content-center h-full">

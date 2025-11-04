@@ -1,20 +1,19 @@
-import { useFetcher, useNavigate, useRouteLoaderData } from "@remix-run/react";
+import { ActionFunctionArgs, useFetcher, useNavigate, useRouteLoaderData } from "react-router";
 import { PropsWithChildren } from "react";
 import { ReportType } from "./types";
-import { ActionFunction } from "@remix-run/node";
 import db from "~/db/client.server";
 import { resourceReport } from "~/db/schema";
 import { loader as rootLoader } from "~/root";
 import { getAuthInfo } from "~/utils.server";
 import { useOverflowHidden } from "~/hooks/overflowhidden";
 
-export const action: ActionFunction = async ({ request, context, params }) => {
+export async function action({ request, context, params }: ActionFunctionArgs) {
     const user = await getAuthInfo({ request, context });
     const { id } = params;
     const form = await request.formData();
     const reportType = form.get("reportType") as ReportType | null;
 
-    if (!reportType || !user.auth || !id) return null;
+    if (!reportType || !user.auth || !id) throw new Response("Login required", { status: 403 });
 
     await db.insert(resourceReport).values({
         category: reportType,

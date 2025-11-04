@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { PropsWithChildren } from "react";
 import { FaUser } from "react-icons/fa";
 import { MdCategory, MdClass } from "react-icons/md";

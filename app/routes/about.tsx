@@ -1,9 +1,9 @@
-import { MetaFunction } from "@remix-run/node";
+import { MetaFunction } from "react-router";
 import LogoComponent from "~/components/logos/logo";
 import UmiraLogo from "~/components/logos/umira.svg?react";
 import NDHUResLogo from "~/components/logos/logo_icon.svg?react";
 import { FaGithub } from "react-icons/fa";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
 export const meta: MetaFunction = () => {
     return [

@@ -1,13 +1,8 @@
-import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaFunction } from "react-router";
 import { count } from "drizzle-orm";
 import ResourceCardComponent from "../../components/resource_card";
 import db from "~/db/client.server";
-import {
-    Link,
-    useLoaderData,
-    useRouteLoaderData,
-    useSearchParams,
-} from "@remix-run/react";
+import { Link, useLoaderData, useRouteLoaderData, useSearchParams } from "react-router";
 import { classFormat, Premission } from "~/utils";
 import { useState } from "react";
 import {

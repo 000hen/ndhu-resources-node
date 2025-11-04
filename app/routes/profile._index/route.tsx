@@ -1,5 +1,5 @@
-import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { LoaderFunctionArgs, MetaFunction } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { eq, sql } from "drizzle-orm";
 import { MdEdit, MdLocalPolice, MdLogout, MdNoAccounts, MdStorage, MdThumbDown, MdThumbUp, MdVerified } from "react-icons/md";
 import CardComponent from "~/components/card";

@@ -1,4 +1,4 @@
-import { AppLoadContext, redirect } from "@remix-run/node";
+import { AppLoadContext, redirect } from "react-router";
 import { DecodedIdToken } from "./types/firebase";
 import { auth as serverAuth } from "./firebase.server";
 import cookie from "./storage/cookies.server";

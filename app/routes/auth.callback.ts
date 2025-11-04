@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs } from "react-router";
 import { authorizationCodeGrant, fetchUserInfo } from "openid-client";
 import { resource } from "~/auth/muid.server";
 import { auth } from "~/firebase.server";

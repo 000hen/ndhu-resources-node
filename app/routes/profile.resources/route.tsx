@@ -1,4 +1,4 @@
-import { Outlet } from "@remix-run/react";
+import { Outlet } from "react-router";
 import { useState } from "react";
 import GridViewPanel from "~/components/grid_view_panel";
 

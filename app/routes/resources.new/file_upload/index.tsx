@@ -2,7 +2,7 @@ import { useEffect, useReducer } from "react";
 import { CHUNK_SIZE, DataUploadElementProps } from "~/types/upload";
 import { ClientActionType, FileUploadState, ServerActionType, UploadParts } from "./types";
 import { action } from "./index.server";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher } from "react-router";
 import { ActionType, reducer } from "./reducer";
 import { uploadPart } from "./uploader";
 import { classFormat } from "~/utils";

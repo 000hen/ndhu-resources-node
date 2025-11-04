@@ -1,5 +1,5 @@
-import { ActionFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
-import { useNavigate, useSearchParams } from "@remix-run/react";
+import { ActionFunctionArgs, MetaFunction, redirect } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import ResourcePanel from "~/components/panel";
 import { MdArrowLeft, MdArrowRight, MdCheck } from "react-icons/md";
 import { DataUpload } from "~/types/upload";

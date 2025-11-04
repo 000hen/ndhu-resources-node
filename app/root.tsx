@@ -9,7 +9,7 @@ import {
     useLoaderData,
     useMatches,
     useRouteError,
-} from "@remix-run/react";
+} from "react-router";
 import { useState } from "react";
 import {
     MdAdminPanelSettings,
@@ -25,7 +25,7 @@ import {
 import PanelLink from "./components/panel_link";
 import { IconType } from "react-icons";
 import LogoComponent from "./components/logos/logo";
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs } from "react-router";
 import { AuthInfo, getAuthInfoWithPremission } from "./utils.server";
 import { FaGithub, FaUser } from "react-icons/fa";
 import { googleImageResize, Premission } from "./utils";

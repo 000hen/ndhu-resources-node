@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { PropsWithChildren } from "react";
 import { IconType } from "react-icons";
 import { MdArrowForwardIos } from "react-icons/md";

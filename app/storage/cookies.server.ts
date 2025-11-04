@@ -1,4 +1,4 @@
-import { createCookie } from "@remix-run/node";
+import { createCookie } from "react-router";
 import { v4 } from "uuid";
 
 export default createCookie("session", {

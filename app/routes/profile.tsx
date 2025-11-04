@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs } from "react-router";
 import { getAuthInfo, redirectToLogin } from "~/utils.server";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {

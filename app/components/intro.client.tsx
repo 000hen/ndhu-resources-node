@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Configs, getConfigs, saveConfigs } from "~/storage/configs.client";
 import { AlertBox } from "./alert_box";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
 export function IntroMessage() {
     const [isShown, setIsShown] = useState(

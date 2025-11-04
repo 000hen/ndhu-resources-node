@@ -1,9 +1,9 @@
-import { LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { Outlet, useLoaderData, useMatches } from "@remix-run/react";
+import { LoaderFunctionArgs, redirect } from "react-router";
+import { Outlet, useLoaderData, useMatches } from "react-router";
 import { PropsWithChildren } from "react";
 import { FaUser } from "react-icons/fa";
 import { MdClass, MdDescription, MdFlag, MdSort } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { classFormat, Premission } from "~/utils";
 import { getAuthInfoWithPremission, redirectToLogin } from "~/utils.server";
 

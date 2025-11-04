@@ -1,4 +1,4 @@
-import { ActionFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs } from "react-router";
 import { sql } from "drizzle-orm";
 import db from "~/db/client.server";
 import { courses, resourceCategory } from "~/db/schema";

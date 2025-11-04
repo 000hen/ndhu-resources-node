@@ -1,4 +1,4 @@
-import { redirect } from "@remix-run/node";
+import { redirect } from "react-router";
 import { buildAuthorizationUrl, randomState } from "openid-client";
 import { resource } from "~/auth/muid.server";
 

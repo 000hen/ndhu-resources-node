@@ -3,11 +3,9 @@ import {
     LoaderFunctionArgs,
     MetaFunction,
     redirect,
-    TypedResponse,
-} from "@remix-run/node";
+} from "react-router";
 import db from "~/db/client.server";
 import invariant from "tiny-invariant";
-import { ResourceInterface } from "~/types/resource";
 import { and, eq, sql } from "drizzle-orm";
 import {
     Link,
@@ -17,7 +15,7 @@ import {
     useNavigate,
     useOutlet,
     useRouteLoaderData,
-} from "@remix-run/react";
+} from "react-router";
 import { getResourceSignedUrl, getResourceSize } from "~/storage/aws.server";
 import {
     MdCategory,

@@ -1,5 +1,5 @@
-import { MetaFunction } from "@remix-run/node";
-import { useRouteLoaderData } from "@remix-run/react";
+import { MetaFunction } from "react-router";
+import { useRouteLoaderData } from "react-router";
 import { loader as rootLoader } from "~/root";
 import { Premission } from "~/utils";
 
