@@ -102,7 +102,7 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
         .where(eq(resources.id, resourceId))
         .execute();
 
-    return redirect("..");
+    return null;
 }
 
 export default function ResourceEditIndex() {

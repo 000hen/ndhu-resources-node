@@ -480,7 +480,7 @@ export default function ResourcePage() {
 
             {outlet && (
                 <AlertBox
-                    onClose={() => navigate(matches.at(-2)?.pathname || "#")}
+                    onClose={() => navigate(-1)}
                 >
                     {outlet}
                 </AlertBox>
