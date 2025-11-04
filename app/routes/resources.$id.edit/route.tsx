@@ -1,7 +1,7 @@
 import {
     ActionFunctionArgs,
     isRouteErrorResponse,
-    redirectDocument,
+    redirect,
     useFetcher,
     useRouteError,
     useRouteLoaderData,
@@ -102,7 +102,7 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
         .where(eq(resources.id, resourceId))
         .execute();
 
-    return redirectDocument("..");
+    return redirect("..");
 }
 
 export default function ResourceEditIndex() {
