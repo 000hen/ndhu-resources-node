@@ -21,7 +21,8 @@ type SortByPopularity = SubqueryWithSelection<
 >;
 
 async function sortByPopularity(
-    popularity: SortByPopularity
+    popularity: SortByPopularity,
+    offset: number
 ): Promise<ResourceInterface[]> {
     const start = performance.now();
     const result = await db
@@ -51,7 +52,9 @@ async function sortByPopularity(
         .leftJoin(resourceCategory, eq(resources.type, resourceCategory.id))
         .leftJoin(pushOrDump, eq(resources.id, pushOrDump.resource))
         .groupBy(resources.id, courses.id, resourceCategory.id)
-        .orderBy(desc(popularity.popularity));
+        .orderBy(desc(popularity.popularity))
+        .limit(20)
+        .offset(offset);
     const end = performance.now();
     console.log(`sortByPopularity query took ${end - start}ms`);
 
@@ -100,7 +103,7 @@ export async function sortByVotes(offset: number) {
         sum(pushOrDump.isPush).mapWith(Number).as("popularity"),
         offset
     );
-    return await sortByPopularity(mostPopular);
+    return await sortByPopularity(mostPopular, offset);
 }
 
 export async function sortByDownloads(offset: number) {
@@ -109,7 +112,7 @@ export async function sortByDownloads(offset: number) {
         count().as("popularity"),
         offset
     );
-    return await sortByPopularity(mostPopular);
+    return await sortByPopularity(mostPopular, offset);
 }
 
 export async function sortByFavorite(offset: number) {
@@ -118,7 +121,7 @@ export async function sortByFavorite(offset: number) {
         count().as("popularity"),
         offset
     );
-    return await sortByPopularity(mostPopular);
+    return await sortByPopularity(mostPopular, offset);
 }
 
 export async function sortByDefault(
