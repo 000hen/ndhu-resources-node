@@ -412,7 +412,7 @@ export default function ResourcePage() {
                             </div>
                             <div className="mt-5 min-w-max flex flex-row gap-2">
                                 {data.state !== "approved" && (
-                                    <button className="btn btn-disabled lg:min-w-60 w-full xl:w-40">
+                                    <button className="btn btn-disabled lg:min-w-60 xl:w-40 xl:flex-none flex-auto">
                                         {data.state === "pending" ||
                                         data.state === "uploading"
                                             ? "檔案正在審核中，暫時不開放下載"
@@ -432,7 +432,7 @@ export default function ResourcePage() {
                                                         )
                                                 )
                                             }
-                                            className="btn lg:min-w-60 w-full xl:w-40"
+                                            className="btn lg:min-w-60 xl:w-40 xl:flex-none flex-auto"
                                         >
                                             請先登入至東華資源庫
                                         </button>
@@ -447,7 +447,7 @@ export default function ResourcePage() {
                                                 (parentData.premission || 0) <
                                                 Premission.VerifiedUser
                                             }
-                                            className="btn btn-success lg:min-w-60 w-full xl:w-40"
+                                            className="btn btn-success lg:min-w-60 xl:w-40 xl:flex-none flex-auto"
                                         >
                                             {(parentData.premission || 0) >=
                                             Premission.VerifiedUser ? (

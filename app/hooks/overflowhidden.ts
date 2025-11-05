@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 
-export const useOverflowHidden = (inital = true) => {
+interface UseOverflowHiddenOptions {
+    inital?: boolean;
+    moveToTop?: boolean;
+}
+
+export const useOverflowHidden = ({
+    inital = true,
+    moveToTop = false,
+}: UseOverflowHiddenOptions = {}) => {
     const [isOverflowHidden, setIsOverflowHidden] = useState(inital);
 
     useEffect(() => {
@@ -8,10 +16,14 @@ export const useOverflowHidden = (inital = true) => {
         if (!doc) return;
 
         doc.style.overflow = isOverflowHidden ? "hidden" : "";
+
+        const originalScroll = doc.scrollTop;
+        if (moveToTop) doc.scrollTo(0, 0);
         return () => {
             doc.style.overflow = "";
+            if (moveToTop) doc.scrollTo(0, originalScroll);
         };
     }, [isOverflowHidden]);
 
     return setIsOverflowHidden;
-}
+};

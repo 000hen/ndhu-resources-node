@@ -1,5 +1,6 @@
 import { PropsWithChildren } from "react";
 import { MdClose } from "react-icons/md";
+import { useOverflowHidden } from "~/hooks/overflowhidden";
 
 interface AlertBoxProps extends PropsWithChildren {
     isClosed?: boolean;
@@ -7,9 +8,11 @@ interface AlertBoxProps extends PropsWithChildren {
 }
 
 export function AlertBox(configs: AlertBoxProps) {
+    useOverflowHidden({ moveToTop: true });
+
     return (
         <div className="absolute top-0 right-0 w-full h-full z-999999 bg-neutral/60 backdrop-blur-sm flex justify-center items-center">
-            <div className="card p-5 bg-neutral h-full md:h-fit md:m-10 w-full md:w-[600px] shadow-xl">
+            <div className="sticky card p-5 bg-neutral h-full md:h-fit md:m-10 w-full md:w-[600px] shadow-xl">
                 <div className="flex justify-end w-full">
                     <div
                         className="tooltip tooltip-left md:tooltip-top"

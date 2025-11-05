@@ -122,8 +122,6 @@ export default function ResourceEditIndex() {
     );
     const parentData = useRouteLoaderData<typeof rootLoader>("root");
 
-    useOverflowHidden();
-
     return (
         <fetcher.Form method="post" className="space-y-6">
             <div>

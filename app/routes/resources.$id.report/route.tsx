@@ -59,8 +59,6 @@ export default function ResourcesPageReportIndex() {
     const fetcher = useFetcher<typeof action>();
     const navigate = useNavigate();
 
-    useOverflowHidden();
-
     return (
         <div>
             <h1>檢舉濫用</h1>
